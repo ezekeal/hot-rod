@@ -1,0 +1,18 @@
+{
+  "name": "hot-rod",
+  "version": "1.0.0",
+  "description": "A gui for npm projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://www.github.com/ezekeal/hot-rod.git"
+  },
+  "author": "Zach Koch",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "electron": "^0.4.1"
+  }
+}
