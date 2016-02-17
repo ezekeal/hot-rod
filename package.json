@@ -2,17 +2,21 @@
   "name": "hot-rod",
   "version": "1.0.0",
   "description": "A gui for npm projects",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "make": "elm make Main.elm --warn --output=elm.js",
+    "run": "electron main.js",
+    "start": "npm run make && npm run run"
   },
   "repository": {
     "type": "git",
-    "url": "http://www.github.com/ezekeal/hot-rod.git"
+    "url": "http://www.github.com/ezekeal/hot-rod"
   },
   "author": "Zach Koch",
   "license": "UNLICENSED",
-  "dependencies": {
-    "electron": "^0.4.1"
+  "dependencies": {},
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.7",
+    "elm": "^0.16.0"
   }
 }
