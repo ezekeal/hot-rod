@@ -1,6 +1,7 @@
 'use strict'
 
 const electron = require('electron')
+const chokidar = require('chokidar')
 const app = electron.app // Module to control application life.
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
 const nativeImage = electron.nativeImage
@@ -18,7 +19,7 @@ function createWindow () {
   mainWindow.setProgressBar(-1)
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/index.html')
+  mainWindow.loadURL(`file://${ __dirname }/index.html`)
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
@@ -52,3 +53,9 @@ app.on('activate', function () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', createWindow)
+
+chokidar.watch(['ports.js', 'index.html', 'elm.js']).on('change', () => {
+  if (mainWindow) {
+    mainWindow.reload()
+  }
+})

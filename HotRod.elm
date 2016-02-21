@@ -1,49 +1,55 @@
 module HotRod where
 
-import Html exposing (..)
-import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Effects exposing (Effects, Never)
 import Json.Encode exposing (Value)
-import Graphics.Element exposing (show)
+import Graphics.Element exposing(show)
+import Html exposing (..)
+import Html.Events exposing (onClick)
 
 -- MODEL
 
-type alias Model = Int
+type alias Model = Value
+
+init : (Model, Effects Action)
+init =
+  ( Json.Encode.object [ ]
+  , Effects.none
+  )
 
 
 -- UPDATE
 
-type Action = Increment | Decrement
+type Action
+  = NoOp
+  | RequestPackageJson
+  | ReceivePackageJson Value
 
-update : Action -> Model -> Model
+update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
-    Increment ->
-      model + 1
+    NoOp ->
+      (model, Effects.none)
 
-    Decrement ->
-      model - 1
+    RequestPackageJson ->
+      (model, fetchPackageJson)
 
+    ReceivePackageJson value ->
+      (value, Effects.none)
+
+fetchPackageJson : Effects Action
+fetchPackageJson =
+  Signal.send fetchPackageJsonBox.address ()
+  |> Effects.task
+  |> Effects.map (always NoOp)
+
+fetchPackageJsonBox : Signal.Mailbox ()
+fetchPackageJsonBox = Signal.mailbox ()
 
 -- VIEW
 
--- view : Signal.Address Action -> Model -> Html
--- view address model =
---   div []
---     [ button [ onClick address Decrement ] [ text "-" ]
---     , div [ countStyle ] [ text (toString model) ]
---     , button [ onClick address Increment ] [ text "+" ]
---     ]
+view : Signal.Address Action -> Model -> Html
 view address model =
-  show packageJSON
-
-
--- countStyle : Attribute
--- countStyle =
---   style
---     [ ("font-size", "20px")
---     , ("font-family", "monospace")
---     , ("display", "inline-block")
---     , ("width", "50px")
---     , ("text-align", "center")
---     ]
+  div [ ]
+    [ button  [ onClick address RequestPackageJson ] [ text "click me" ]
+    , fromElement (show model)
+    ]

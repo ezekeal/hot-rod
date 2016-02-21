@@ -4,16 +4,25 @@
 const fs = require('fs')
 const path = require('path')
 
+// start the elm app in a container div
 let container = document.getElementById('container')
-let hotrod = Elm.embed(Elm.Main, container, { packageJSON: {} })
+let hotrod = Elm.embed(Elm.Main, container, {
+  packageJson: {}
+})
 
-fs.readFile(path.join(__dirname, 'package.json') + '',
-  (err, data) => {
-    if (err) { console.log(err) }
-    let pj = parseJSON(data)
-    console.log('sending', pj)
-    hotrod.ports.packageJSON.send(pj)
-  })
+hotrod.ports.fetchPackageJsonSignal.subscribe(fetchPackageJson)
+
+function fetchPackageJson () {
+  fs.readFile(path.join(__dirname, 'package.json') + '',
+    (err, data) => {
+      if (err) {
+        hotrod.ports.packageJson.send({ error: err })
+      }
+      let pj = parseJSON(data)
+      console.log('sending', pj)
+      hotrod.ports.packageJson.send(pj)
+    })
+}
 
 function parseJSON (content) {
   return JSON.parse(stripBOM(content))

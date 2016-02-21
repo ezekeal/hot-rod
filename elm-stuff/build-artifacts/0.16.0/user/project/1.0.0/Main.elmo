@@ -6,16 +6,28 @@ Elm.Main.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $HotRod = Elm.HotRod.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $StartApp = Elm.StartApp.make(_elm),
+   $Task = Elm.Task.make(_elm);
    var _op = {};
-   var packageJSON = Elm.Native.Port.make(_elm).inboundSignal("packageJSON","Json.Encode.Value",function (v) {    return v;});
-   var view = function (data) {    return A2($Html.div,_U.list([]),_U.list([$Html.fromElement($Graphics$Element.show(data))]));};
-   var main = A2($Signal.map,view,packageJSON);
-   return _elm.Main.values = {_op: _op,main: main,view: view};
+   var fetchPackageJsonSignal = Elm.Native.Port.make(_elm).outboundSignal("fetchPackageJsonSignal",
+   function (v) {
+      return [];
+   },
+   $HotRod.fetchPackageJsonBox.signal);
+   var packageJson = Elm.Native.Port.make(_elm).inboundSignal("packageJson","Json.Encode.Value",function (v) {    return v;});
+   var app = $StartApp.start({init: $HotRod.init
+                             ,update: $HotRod.update
+                             ,view: $HotRod.view
+                             ,inputs: _U.list([A2($Signal.map,$HotRod.ReceivePackageJson,packageJson)])});
+   var main = app.html;
+   var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
+   return _elm.Main.values = {_op: _op,app: app,main: main};
 };

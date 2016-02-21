@@ -6,28 +6,42 @@ Elm.HotRod.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
+   $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var countStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "font-size",_1: "20px"}
-                                                   ,{ctor: "_Tuple2",_0: "font-family",_1: "monospace"}
-                                                   ,{ctor: "_Tuple2",_0: "display",_1: "inline-block"}
-                                                   ,{ctor: "_Tuple2",_0: "width",_1: "50px"}
-                                                   ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}]));
-   var update = F2(function (action,model) {    var _p0 = action;if (_p0.ctor === "Increment") {    return model + 1;} else {    return model - 1;}});
-   var Decrement = {ctor: "Decrement"};
-   var Increment = {ctor: "Increment"};
+   var fetchPackageJsonBox = $Signal.mailbox({ctor: "_Tuple0"});
+   var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
+   var RequestPackageJson = {ctor: "RequestPackageJson"};
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,Decrement)]),_U.list([$Html.text("-")]))
-              ,A2($Html.div,_U.list([countStyle]),_U.list([$Html.text($Basics.toString(model))]))
-              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,Increment)]),_U.list([$Html.text("+")]))]));
+      _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,RequestPackageJson)]),_U.list([$Html.text("click me")]))
+              ,$Html.fromElement($Graphics$Element.show(model))]));
    });
-   return _elm.HotRod.values = {_op: _op,Increment: Increment,Decrement: Decrement,update: update,view: view,countStyle: countStyle};
+   var NoOp = {ctor: "NoOp"};
+   var fetchPackageJson = A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchPackageJsonBox.address,{ctor: "_Tuple0"})));
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      switch (_p0.ctor)
+      {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         case "RequestPackageJson": return {ctor: "_Tuple2",_0: model,_1: fetchPackageJson};
+         default: return {ctor: "_Tuple2",_0: _p0._0,_1: $Effects.none};}
+   });
+   var init = {ctor: "_Tuple2",_0: $Json$Encode.object(_U.list([])),_1: $Effects.none};
+   return _elm.HotRod.values = {_op: _op
+                               ,init: init
+                               ,NoOp: NoOp
+                               ,RequestPackageJson: RequestPackageJson
+                               ,ReceivePackageJson: ReceivePackageJson
+                               ,update: update
+                               ,fetchPackageJson: fetchPackageJson
+                               ,fetchPackageJsonBox: fetchPackageJsonBox
+                               ,view: view};
 };

@@ -4,9 +4,10 @@
   "description": "A gui for npm projects",
   "main": "main.js",
   "scripts": {
-    "make": "elm make Main.elm --warn --output=elm.js",
-    "run": "electron main.js",
-    "start": "npm run make && npm run run"
+    "elm": "elm make Main.elm --warn --output elm.js || true",
+    "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'",
+    "start": "electron main.js",
+    "watch": "npm run start & npm run elm:watch & wait"
   },
   "repository": {
     "type": "git",
@@ -16,6 +17,7 @@
   "license": "UNLICENSED",
   "dependencies": {},
   "devDependencies": {
+    "chokidar-cli": "^1.2.0",
     "electron-prebuilt": "^0.36.7",
     "elm": "^0.16.0"
   }
