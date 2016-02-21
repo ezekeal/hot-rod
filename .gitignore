@@ -31,4 +31,6 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
->>>>>>> fd3e3fedb4eb6c963f40c3d775f8b5dcacca8d89
+
+# ELM
+elm-stuff
