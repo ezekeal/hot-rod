@@ -2,7 +2,6 @@ module PackageJson where
 
 import Json.Decode exposing (..)
 import Json.Decode.Extra exposing ((|:))
-import Dict exposing (Dict)
 import String
 
 -- Types
@@ -19,7 +18,6 @@ type alias PackageJson =
     , contributors : Maybe (List Person)
     , files : Maybe (List String)
     , main : Maybe String
-    , bin : Maybe Bin
     }
 
 type alias Person =
@@ -27,17 +25,6 @@ type alias Person =
     , email : Maybe String
     , url : Maybe String
     }
-
-type alias Bin =
-    { name : Maybe String
-    , version : Maybe String
-    , bin : Maybe { fileName : Maybe String
-            , filePath : Maybe String
-            }
-    }
-
-type alias NamedBin =
-    { bin : (String, String) }
 
 -- Default
 
@@ -54,19 +41,13 @@ default =
     , contributors = Nothing
     , files = Nothing
     , main = Nothing
-    , bin = Nothing
     }
 
+defaultPerson : Person
 defaultPerson =
     { name = ""
     , email = Nothing
     , url = Nothing
-    }
-
-defaultBin =
-    { name = Nothing
-    , version = Nothing
-    , bin = Nothing
     }
 
 -- Decoders
@@ -85,7 +66,6 @@ packageJsonDecoder =
     |: maybe ("contributors" := list personDecoder) --Start testing here
     |: maybe ("files" := list string)
     |: maybe ("main" := string)
-    |: maybe ("bin" := binDecoder)
 
 personDecoder : Decoder Person
 personDecoder =
@@ -105,32 +85,6 @@ personDecoder =
         ]
 
 
-binDecoder : Decoder Bin
-binDecoder  =
-    succeed Bin
-    |: ("name" := maybe string)
-    |: ("version" := maybe string)
-    |: ("bin" := maybe (oneOf [ string |> map binDecoderC, (dict string) |> map binDecoderB ]))
-
-
-binDecoderB obj =
-    let key =
-            Dict.keys obj
-            |> List.head
-            |> Maybe.withDefault Nothing
-
-        value =
-            Dict.values obj
-            |> List.head
-            |> Maybe.withDefault Nothing
-    in
-        { fileName = key, filePath = value }
-
-
-binDecoderC str =
-    { fileName = str , filePath = str }
-
-
 decode : String -> PackageJson
 decode value =
     (decodeString packageJsonDecoder) value
@@ -144,4 +98,4 @@ baseName str =
     String.split "/" str
     |> List.reverse
     |> List.head
-    |> Result.withDefault ""
+    |> Maybe.withDefault ""

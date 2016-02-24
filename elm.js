@@ -10712,8 +10712,11 @@ Elm.PackageJson.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
    var _op = {};
+   var baseName = function (str) {    return A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"/",str))));};
+   var defaultPerson = {name: "",email: $Maybe.Nothing,url: $Maybe.Nothing};
    var $default = {name: ""
                   ,version: ""
                   ,description: $Maybe.Nothing
@@ -10727,13 +10730,13 @@ Elm.PackageJson.make = function (_elm) {
                   ,main: $Maybe.Nothing};
    var Person = F3(function (a,b,c) {    return {name: a,email: b,url: c};});
    var personDecoder = function () {
-      var personString = function (str) {    return {name: str,email: $Maybe.Nothing,url: $Maybe.Nothing};};
+      var personString = function (str) {    return _U.update(defaultPerson,{name: str});};
       var person = A2($Json$Decode$Extra._op["|:"],
       A2($Json$Decode$Extra._op["|:"],
       A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(Person),A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"email",$Json$Decode.string))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"url",$Json$Decode.string)));
-      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,personString,$Json$Decode.string),person]));
+      return $Json$Decode.oneOf(_U.list([person,A2($Json$Decode.map,personString,$Json$Decode.string)]));
    }();
    var PackageJson = function (a) {
       return function (b) {
@@ -10794,9 +10797,11 @@ Elm.PackageJson.make = function (_elm) {
                                     ,PackageJson: PackageJson
                                     ,Person: Person
                                     ,$default: $default
+                                    ,defaultPerson: defaultPerson
                                     ,packageJsonDecoder: packageJsonDecoder
                                     ,personDecoder: personDecoder
-                                    ,decode: decode};
+                                    ,decode: decode
+                                    ,baseName: baseName};
 };
 Elm.HotRod = Elm.HotRod || {};
 Elm.HotRod.make = function (_elm) {
