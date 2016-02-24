@@ -1,7 +1,7 @@
 module PackageJson where
 
 import Json.Decode exposing (..)
-import Json.Decode.Extra exposing ((|:))
+import Json.Decode.Extra exposing ((|:), lazy)
 import String
 
 -- Types
@@ -18,6 +18,7 @@ type alias PackageJson =
     , contributors : Maybe (List Person)
     , files : Maybe (List String)
     , main : Maybe String
+    , bin : Maybe Bin
     }
 
 type alias Person =
@@ -25,6 +26,20 @@ type alias Person =
     , email : Maybe String
     , url : Maybe String
     }
+
+type alias Bin =
+    { name : String
+    , version : Maybe String
+    , bin : String
+    }
+
+bin : String -> Maybe String -> String -> Bin
+bin name version bin =
+    { name = name
+    , version = version
+    , bin = bin
+    }
+
 
 -- Default
 
@@ -41,6 +56,7 @@ default =
     , contributors = Nothing
     , files = Nothing
     , main = Nothing
+    , bin = Nothing
     }
 
 defaultPerson : Person
@@ -66,6 +82,7 @@ packageJsonDecoder =
     |: maybe ("contributors" := list personDecoder) --Start testing here
     |: maybe ("files" := list string)
     |: maybe ("main" := string)
+    |: maybe ("bin" := binDecoder)
 
 personDecoder : Decoder Person
 personDecoder =
@@ -84,6 +101,30 @@ personDecoder =
         , string |> map personString
         ]
 
+decodeBinString : Decoder Bin
+decodeBinString =
+    string
+    |> map (\n -> bin (baseName n) Nothing n)
+
+decodeBinPair : Decoder Bin
+decodeBinPair =
+    keyValuePairs string
+    |> map (\n -> Maybe.withDefault ("", "") (List.head n))
+    |> map (\(key,value) -> bin key Nothing value)
+
+decodeBinObject : Decoder Bin
+decodeBinObject =
+    object3 bin
+        ("name" := string)
+        (maybe ("version" := string))
+        ("bin" := string)
+
+binDecoder : Decoder Bin
+binDecoder =
+  oneOf [ decodeBinString
+        , decodeBinObject
+        , decodeBinPair
+        ]
 
 decode : String -> PackageJson
 decode value =
