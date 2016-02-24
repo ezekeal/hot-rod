@@ -1,19 +1,19 @@
-import HotRod exposing (update, view, init, Action, fetchPackageJsonBox)
+import HotRod exposing (update, view, init, fetchFileBox, receiveFile)
 import Html exposing (Html)
-import StartApp exposing (start)
-import Effects exposing (Never)
+import StartApp
+import Effects
 import Task
-import Json.Encode exposing (Value)
+import Json.Encode
 
 app : StartApp.App HotRod.Model
 app =
-  start
-    { init = init
-    , update = update
-    , view = view
-    , inputs =
-      [ Signal.map HotRod.ReceivePackageJson packageJson ]
-    }
+    StartApp.start
+        { init = init
+        , update = update
+        , view = view
+        , inputs =
+            [ Signal.map receiveFile file ]
+        }
 
 main : Signal Html.Html
 main =
@@ -22,12 +22,12 @@ main =
 
 -- PORTS
 
-port tasks : Signal (Task.Task Never ())
+port tasks : Signal (Task.Task Effects.Never ())
 port tasks =
     app.tasks
 
-port packageJson : Signal Value
+port fetchFile : Signal String
+port fetchFile =
+    fetchFileBox.signal
 
-port fetchPackageJsonSignal : Signal ()
-port fetchPackageJsonSignal =
-  fetchPackageJsonBox.signal
+port file : Signal Json.Encode.Value

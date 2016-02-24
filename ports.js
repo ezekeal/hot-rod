@@ -7,32 +7,23 @@ const path = require('path')
 // start the elm app in a container div
 let container = document.getElementById('container')
 let hotrod = Elm.embed(Elm.Main, container, {
-  packageJson: {}
+  file: { name: '', fileName: '', contents: '' }
 })
 
-hotrod.ports.fetchPackageJsonSignal.subscribe(fetchPackageJson)
-
-function fetchPackageJson () {
-  fs.readFile(path.join(__dirname, 'package.json') + '',
-    (err, data) => {
-      if (err) {
-        hotrod.ports.packageJson.send({ error: err })
-      }
-      let pj = parseJSON(data)
-      console.log('sending', pj)
-      hotrod.ports.packageJson.send(pj)
-    })
-}
-
-function parseJSON (content) {
-  return JSON.parse(stripBOM(content))
-}
-
-function stripBOM (content) {
-  content = content.toString()
-  // Remove byte order marker. I'm taking npm's word for it
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1)
-  }
-  return content
-}
+hotrod.ports.fetchFile.subscribe((filePath) => {
+  let extension = path.extname(filePath)
+  let fileName = path.basename(filePath)
+  fs.readFile(path.join(__dirname, filePath), 'utf8', (error, data) => {
+    if (error) {
+      console.log('error', error)
+      hotrod.ports.fileError.send(error)
+    }
+    let file = {
+      name: fileName,
+      extension: extension,
+      contents: data
+    }
+    console.log('sending', file)
+    hotrod.ports.file.send(file)
+  })
+})

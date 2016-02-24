@@ -2,6 +2,7 @@
   "name": "hot-rod",
   "version": "1.0.0",
   "description": "A gui for npm projects",
+  "keywords": ["elm", "electron", "gui"],
   "main": "main.js",
   "scripts": {
     "elm": "elm make Main.elm --warn --output elm.js || true",
@@ -13,7 +14,7 @@
     "type": "git",
     "url": "http://www.github.com/ezekeal/hot-rod"
   },
-  "author": "Zach Koch",
+  "author": { "name": "Zach Koch" },
   "license": "UNLICENSED",
   "dependencies": {},
   "devDependencies": {
