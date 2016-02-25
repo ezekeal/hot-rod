@@ -18,26 +18,14 @@ type alias PackageJson =
     , contributors : Maybe (List Person)
     , files : Maybe (List String)
     , main : Maybe String
-    , bin : Maybe Bin
+    , bin : Maybe (String, String)
+    , man : Maybe (List String)
     }
 
 type alias Person =
     { name : String
     , email : Maybe String
     , url : Maybe String
-    }
-
-type alias Bin =
-    { name : String
-    , version : Maybe String
-    , bin : String
-    }
-
-bin : String -> Maybe String -> String -> Bin
-bin name version bin =
-    { name = name
-    , version = version
-    , bin = bin
     }
 
 
@@ -57,6 +45,7 @@ default =
     , files = Nothing
     , main = Nothing
     , bin = Nothing
+    , man = Nothing
     }
 
 defaultPerson : Person
@@ -82,7 +71,8 @@ packageJsonDecoder =
     |: maybe ("contributors" := list personDecoder) --Start testing here
     |: maybe ("files" := list string)
     |: maybe ("main" := string)
-    |: maybe ("bin" := binDecoder)
+    |: maybe ("bin" := stringOrKeyValue)
+    |: maybe ("man" := stringOrListString)
 
 personDecoder : Decoder Person
 personDecoder =
@@ -101,30 +91,19 @@ personDecoder =
         , string |> map personString
         ]
 
-decodeBinString : Decoder Bin
-decodeBinString =
-    string
-    |> map (\n -> bin (baseName n) Nothing n)
+stringOrKeyValue : Decoder (String, String)
+stringOrKeyValue =
+    oneOf
+    [ string |> map (\n -> (baseName n, n))
+    , (keyValuePairs string) |> map (\n -> Maybe.withDefault ("","") (List.head n))
+    ]
 
-decodeBinPair : Decoder Bin
-decodeBinPair =
-    keyValuePairs string
-    |> map (\n -> Maybe.withDefault ("", "") (List.head n))
-    |> map (\(key,value) -> bin key Nothing value)
-
-decodeBinObject : Decoder Bin
-decodeBinObject =
-    object3 bin
-        ("name" := string)
-        (maybe ("version" := string))
-        ("bin" := string)
-
-binDecoder : Decoder Bin
-binDecoder =
-  oneOf [ decodeBinString
-        , decodeBinObject
-        , decodeBinPair
-        ]
+stringOrListString : Decoder (List String)
+stringOrListString =
+    oneOf
+    [ (string |> map (\n -> n :: [ ] ))
+    , list string
+    ]
 
 decode : String -> PackageJson
 decode value =

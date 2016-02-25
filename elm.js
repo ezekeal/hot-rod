@@ -10716,6 +10716,18 @@ Elm.PackageJson.make = function (_elm) {
    $String = Elm.String.make(_elm);
    var _op = {};
    var baseName = function (str) {    return A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"/",str))));};
+   var stringOrListString = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,function (n) {    return A2($List._op["::"],n,_U.list([]));},$Json$Decode.string)
+                                                       ,$Json$Decode.list($Json$Decode.string)]));
+   var stringOrKeyValue = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,
+                                                     function (n) {
+                                                        return {ctor: "_Tuple2",_0: baseName(n),_1: n};
+                                                     },
+                                                     $Json$Decode.string)
+                                                     ,A2($Json$Decode.map,
+                                                     function (n) {
+                                                        return A2($Maybe.withDefault,{ctor: "_Tuple2",_0: "",_1: ""},$List.head(n));
+                                                     },
+                                                     $Json$Decode.keyValuePairs($Json$Decode.string))]));
    var defaultPerson = {name: "",email: $Maybe.Nothing,url: $Maybe.Nothing};
    var $default = {name: ""
                   ,version: ""
@@ -10728,26 +10740,8 @@ Elm.PackageJson.make = function (_elm) {
                   ,contributors: $Maybe.Nothing
                   ,files: $Maybe.Nothing
                   ,main: $Maybe.Nothing
-                  ,bin: $Maybe.Nothing};
-   var bin = F3(function (name,version,bin) {    return {name: name,version: version,bin: bin};});
-   var decodeBinString = A2($Json$Decode.map,function (n) {    return A3(bin,baseName(n),$Maybe.Nothing,n);},$Json$Decode.string);
-   var decodeBinPair = A2($Json$Decode.map,
-   function (_p0) {
-      var _p1 = _p0;
-      return A3(bin,_p1._0,$Maybe.Nothing,_p1._1);
-   },
-   A2($Json$Decode.map,
-   function (n) {
-      return A2($Maybe.withDefault,{ctor: "_Tuple2",_0: "",_1: ""},$List.head(n));
-   },
-   $Json$Decode.keyValuePairs($Json$Decode.string)));
-   var decodeBinObject = A4($Json$Decode.object3,
-   bin,
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"version",$Json$Decode.string)),
-   A2($Json$Decode._op[":="],"bin",$Json$Decode.string));
-   var binDecoder = $Json$Decode.oneOf(_U.list([decodeBinString,decodeBinObject,decodeBinPair]));
-   var Bin = F3(function (a,b,c) {    return {name: a,version: b,bin: c};});
+                  ,bin: $Maybe.Nothing
+                  ,man: $Maybe.Nothing};
    var Person = F3(function (a,b,c) {    return {name: a,email: b,url: c};});
    var personDecoder = function () {
       var personString = function (str) {    return _U.update(defaultPerson,{name: str});};
@@ -10770,18 +10764,21 @@ Elm.PackageJson.make = function (_elm) {
                               return function (j) {
                                  return function (k) {
                                     return function (l) {
-                                       return {name: a
-                                              ,version: b
-                                              ,description: c
-                                              ,keywords: d
-                                              ,homepage: e
-                                              ,bugs: f
-                                              ,license: g
-                                              ,author: h
-                                              ,contributors: i
-                                              ,files: j
-                                              ,main: k
-                                              ,bin: l};
+                                       return function (m) {
+                                          return {name: a
+                                                 ,version: b
+                                                 ,description: c
+                                                 ,keywords: d
+                                                 ,homepage: e
+                                                 ,bugs: f
+                                                 ,license: g
+                                                 ,author: h
+                                                 ,contributors: i
+                                                 ,files: j
+                                                 ,main: k
+                                                 ,bin: l
+                                                 ,man: m};
+                                       };
                                     };
                                  };
                               };
@@ -10805,6 +10802,7 @@ Elm.PackageJson.make = function (_elm) {
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(PackageJson),A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"version",$Json$Decode.string)),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string))),
@@ -10816,21 +10814,18 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"contributors",$Json$Decode.list(personDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"files",$Json$Decode.list($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"main",$Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",binDecoder)));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",stringOrKeyValue))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",stringOrListString)));
    var decode = function (value) {    return A2($Result.withDefault,$default,A2($Json$Decode.decodeString,packageJsonDecoder,value));};
    return _elm.PackageJson.values = {_op: _op
                                     ,PackageJson: PackageJson
                                     ,Person: Person
-                                    ,Bin: Bin
-                                    ,bin: bin
                                     ,$default: $default
                                     ,defaultPerson: defaultPerson
                                     ,packageJsonDecoder: packageJsonDecoder
                                     ,personDecoder: personDecoder
-                                    ,decodeBinString: decodeBinString
-                                    ,decodeBinPair: decodeBinPair
-                                    ,decodeBinObject: decodeBinObject
-                                    ,binDecoder: binDecoder
+                                    ,stringOrKeyValue: stringOrKeyValue
+                                    ,stringOrListString: stringOrListString
                                     ,decode: decode
                                     ,baseName: baseName};
 };
