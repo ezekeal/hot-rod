@@ -18,14 +18,24 @@ type alias PackageJson =
     , contributors : Maybe (List Person)
     , files : Maybe (List String)
     , main : Maybe String
-    , bin : Maybe (String, String)
+    , bin : Maybe (String,String)
     , man : Maybe (List String)
+    , directories : Maybe Directories
+    , repository : Maybe (String,String)
     }
 
 type alias Person =
     { name : String
     , email : Maybe String
     , url : Maybe String
+    }
+
+type alias Directories =
+    { bin : Maybe String
+    , doc : Maybe String
+    , lib : Maybe String
+    , man : Maybe String
+    , example : Maybe String
     }
 
 
@@ -46,6 +56,8 @@ default =
     , main = Nothing
     , bin = Nothing
     , man = Nothing
+    , directories = Nothing
+    , repository = Nothing
     }
 
 defaultPerson : Person
@@ -68,11 +80,14 @@ packageJsonDecoder =
     |: maybe ("bugs" := string)
     |: maybe ("license" := string)
     |: maybe ("author" := personDecoder)
-    |: maybe ("contributors" := list personDecoder) --Start testing here
+    |: maybe ("contributors" := list personDecoder)
     |: maybe ("files" := list string)
     |: maybe ("main" := string)
     |: maybe ("bin" := stringOrKeyValue)
     |: maybe ("man" := stringOrListString)
+    |: maybe ("directories" := directoriesDecoder)
+    |: maybe ("repository" := repositoryDecoder)
+
 
 personDecoder : Decoder Person
 personDecoder =
@@ -91,7 +106,25 @@ personDecoder =
         , string |> map personString
         ]
 
-stringOrKeyValue : Decoder (String, String)
+directoriesDecoder : Decoder Directories
+directoriesDecoder =
+    succeed Directories
+    |: maybe ("bin" := string)
+    |: maybe ("doc" := string)
+    |: maybe ("lib" := string)
+    |: maybe ("man" := string)
+    |: maybe ("example" := string)
+
+repositoryDecoder : Decoder (String, String)
+repositoryDecoder =
+    oneOf
+    [ string |> map (\n -> ("",n))
+    , object2 (,)
+        ("type" := string)
+        ("url" := string)
+    ]
+
+stringOrKeyValue : Decoder (String,String)
 stringOrKeyValue =
     oneOf
     [ string |> map (\n -> (baseName n, n))

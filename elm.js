@@ -10728,6 +10728,11 @@ Elm.PackageJson.make = function (_elm) {
                                                         return A2($Maybe.withDefault,{ctor: "_Tuple2",_0: "",_1: ""},$List.head(n));
                                                      },
                                                      $Json$Decode.keyValuePairs($Json$Decode.string))]));
+   var repositoryDecoder = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,function (n) {    return {ctor: "_Tuple2",_0: "",_1: n};},$Json$Decode.string)
+                                                      ,A3($Json$Decode.object2,
+                                                      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
+                                                      A2($Json$Decode._op[":="],"type",$Json$Decode.string),
+                                                      A2($Json$Decode._op[":="],"url",$Json$Decode.string))]));
    var defaultPerson = {name: "",email: $Maybe.Nothing,url: $Maybe.Nothing};
    var $default = {name: ""
                   ,version: ""
@@ -10741,7 +10746,19 @@ Elm.PackageJson.make = function (_elm) {
                   ,files: $Maybe.Nothing
                   ,main: $Maybe.Nothing
                   ,bin: $Maybe.Nothing
-                  ,man: $Maybe.Nothing};
+                  ,man: $Maybe.Nothing
+                  ,directories: $Maybe.Nothing
+                  ,repository: $Maybe.Nothing};
+   var Directories = F5(function (a,b,c,d,e) {    return {bin: a,doc: b,lib: c,man: d,example: e};});
+   var directoriesDecoder = A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(Directories),$Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"doc",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"lib",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"example",$Json$Decode.string)));
    var Person = F3(function (a,b,c) {    return {name: a,email: b,url: c};});
    var personDecoder = function () {
       var personString = function (str) {    return _U.update(defaultPerson,{name: str});};
@@ -10765,19 +10782,25 @@ Elm.PackageJson.make = function (_elm) {
                                  return function (k) {
                                     return function (l) {
                                        return function (m) {
-                                          return {name: a
-                                                 ,version: b
-                                                 ,description: c
-                                                 ,keywords: d
-                                                 ,homepage: e
-                                                 ,bugs: f
-                                                 ,license: g
-                                                 ,author: h
-                                                 ,contributors: i
-                                                 ,files: j
-                                                 ,main: k
-                                                 ,bin: l
-                                                 ,man: m};
+                                          return function (n) {
+                                             return function (o) {
+                                                return {name: a
+                                                       ,version: b
+                                                       ,description: c
+                                                       ,keywords: d
+                                                       ,homepage: e
+                                                       ,bugs: f
+                                                       ,license: g
+                                                       ,author: h
+                                                       ,contributors: i
+                                                       ,files: j
+                                                       ,main: k
+                                                       ,bin: l
+                                                       ,man: m
+                                                       ,directories: n
+                                                       ,repository: o};
+                                             };
+                                          };
                                        };
                                     };
                                  };
@@ -10803,6 +10826,8 @@ Elm.PackageJson.make = function (_elm) {
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(PackageJson),A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"version",$Json$Decode.string)),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string))),
@@ -10815,15 +10840,20 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"files",$Json$Decode.list($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"main",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",stringOrKeyValue))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",stringOrListString)));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",stringOrListString))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"directories",directoriesDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"repository",repositoryDecoder)));
    var decode = function (value) {    return A2($Result.withDefault,$default,A2($Json$Decode.decodeString,packageJsonDecoder,value));};
    return _elm.PackageJson.values = {_op: _op
                                     ,PackageJson: PackageJson
                                     ,Person: Person
+                                    ,Directories: Directories
                                     ,$default: $default
                                     ,defaultPerson: defaultPerson
                                     ,packageJsonDecoder: packageJsonDecoder
                                     ,personDecoder: personDecoder
+                                    ,directoriesDecoder: directoriesDecoder
+                                    ,repositoryDecoder: repositoryDecoder
                                     ,stringOrKeyValue: stringOrKeyValue
                                     ,stringOrListString: stringOrListString
                                     ,decode: decode

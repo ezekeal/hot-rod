@@ -19,6 +19,10 @@
   , "url": "http://www.github.com/ezekeal/hot-rod"
   }
 , "author": { "name": "Zach Koch" }
+, "repository":
+  { "type": "git"
+  , "url": "https://github.com/ezekeal/hot-rod"
+  }
 , "license": "UNLICENSED"
 , "dependencies": {}
 ,  "devDependencies":
