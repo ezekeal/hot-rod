@@ -44,6 +44,10 @@ a:hover {
   border-bottom: 2px solid rgba(0,0,0,0.08);
 }
 
+.field {
+  margin-bottom: 0.6rem;
+}
+
 .field .sub-field {
   margin: 0;
 }

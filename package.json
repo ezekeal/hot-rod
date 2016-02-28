@@ -8,6 +8,7 @@
     , "gui"
     ]
 , "main": "main.js"
+, "homepage": "github.com/ezekeal"
 , "scripts":
   { "elm": "elm make Main.elm --warn --output elm.js || true"
   , "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'"
@@ -16,13 +17,10 @@
   }
 , "repository":
   { "type": "git"
-  , "url": "http://www.github.com/ezekeal/hot-rod"
+  , "url": "github.com/ezekeal/hot-rod"
   }
 , "author": { "name": "Zach Koch" }
-, "repository":
-  { "type": "git"
-  , "url": "https://github.com/ezekeal/hot-rod"
-  }
+, "contributors" : [{"name": "Zach Koch", "email": "ezekeal@gmail.com"}]
 , "license": "UNLICENSED"
 , "dependencies": {}
 ,  "devDependencies":

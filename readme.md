@@ -6,3 +6,4 @@ This is an attempt to build a desktop gui for node projects.
 
 ##Thanks:
 [Bogdan Popa](https://github.com/Bogdanp)
+[Noah Hall](https://github.com/eeue56)

@@ -62,22 +62,69 @@ view address model =
 packageJsonView : PackageJson -> Html
 packageJsonView pj =
     let
+        fieldDiv key valueView value =
+            Maybe.map (valueView >> fieldView key) value
         fields =
-            [ Maybe.map (fieldView "Name") pj.name
-            , Maybe.map (fieldView "Version") pj.version
-            , Maybe.map (fieldView "Description") pj.description
-            , Maybe.map (fieldView "Main") pj.main
-            , Maybe.map repoView pj.repository
+            [ fieldDiv "Name" stringValue pj.name
+            , fieldDiv "Version" stringValue pj.version
+            , fieldDiv "Description" stringValue pj.description
+            , fieldDiv "Main" stringValue pj.main
+            , fieldDiv "Keywords" listValue pj.keywords
+            , fieldDiv "Repository" repoView pj.repository
+            , fieldDiv "Home Page" linkValue pj.homepage
+            , fieldDiv "Bugs" stringValue pj.bugs
+            , fieldDiv "License" stringValue pj.license
+            , fieldDiv "Author" personValue pj.author
+            , fieldDiv "Contributors" (List.map personValue >> div [ ]) pj.contributors
+            , fieldDiv "Files" listValue pj.files
+            , fieldDiv "Man" listValue pj.man
+            , fieldDiv "Bin" pairValue pj.bin
             ]
     in
         div [ class "package-json" ]
             <| List.filterMap identity fields
 
-fieldView : String -> String -> Html
+stringValue : String -> Html
+stringValue value =
+    span [ class "field-value" ] [ text value ]
+
+listValue : List String -> Html
+listValue values =
+    let item str =
+        li [ ] [ text str ]
+    in
+        ul  [ class "sub-field" ]
+            <| List.map item values
+
+listItemValue key value =
+    li [ ] [ fieldView key <| stringValue value ]
+
+linkValue : String -> Html
+linkValue url =
+    span [ class "field-value" ]
+        [ a [ href url ] [ text url ] ]
+
+pairValue : (String,String) -> Html
+pairValue (name, filePath) =
+    fieldView name (stringValue filePath)
+
+personValue : PackageJson.Person -> Html
+personValue {name, email, url} =
+    [ ("Name" , name), ("Email",email), ("Url",url) ]
+    |> List.filterMap (\(key, value) -> Maybe.map (listItemValue key) value)
+    |> ul [ class "sub-field" ]
+
+directoriesValue : PackageJson.Directories -> Html
+directoriesValue {bin, doc, lib, man, example, tests} =
+    [ ("Bin",bin), ("Doc",doc), ("Lib",lib), ("Man",man), ("Example",example), ("Tests", tests) ]
+    |> List.filterMap (\(key, value) -> Maybe.map (listItemValue key) value)
+    |> ul [ class "sub-field" ]
+
+fieldView : String -> Html -> Html
 fieldView key value =
     div [ class "field" ]
         [ span [ class "field-title" ] [ text (key ++ ": ") ]
-        , span [ class "field-value" ] [ text value ]
+        , value
         ]
 
 linkFieldView : String -> String -> Html
@@ -89,13 +136,10 @@ linkFieldView key url =
 
 repoView : (String, String) -> Html
 repoView (repoType, url)=
-    div [ class "field" ]
-    [ span [ class "field-title" ] [ text "Repository: " ]
-    , ul [ class "sub-field" ]
-        [ li [ ] [ fieldView "type" repoType ]
-        , li [ ] [ linkFieldView "url" url ]
+    ul [ class "sub-field" ]
+        [ li [ ] [ fieldView "type" <| stringValue repoType ]
+        , li [ ] [ fieldView "url" <| linkValue url ]
         ]
-    ]
 
 
 

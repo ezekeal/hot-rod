@@ -10974,8 +10974,9 @@ Elm.PackageJson.make = function (_elm) {
                   ,man: $Maybe.Nothing
                   ,directories: $Maybe.Nothing
                   ,repository: $Maybe.Nothing};
-   var Directories = F5(function (a,b,c,d,e) {    return {bin: a,doc: b,lib: c,man: d,example: e};});
+   var Directories = F6(function (a,b,c,d,e,f) {    return {bin: a,doc: b,lib: c,man: d,example: e,tests: f};});
    var directoriesDecoder = A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
@@ -10983,7 +10984,8 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"doc",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"lib",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",$Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"example",$Json$Decode.string)));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"example",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"test",$Json$Decode.string)));
    var Person = F3(function (a,b,c) {    return {name: a,email: b,url: c};});
    var personDecoder = function () {
       var personString = function (str) {    return _U.update(defaultPerson,{name: $Maybe.Just(str)});};
@@ -10992,7 +10994,7 @@ Elm.PackageJson.make = function (_elm) {
       A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(Person),$Json$Decode.maybe(A2($Json$Decode._op[":="],"name",$Json$Decode.string))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"email",$Json$Decode.string))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"url",$Json$Decode.string)));
-      return $Json$Decode.oneOf(_U.list([person,A2($Json$Decode.map,personString,$Json$Decode.string)]));
+      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,personString,$Json$Decode.string),person]));
    }();
    var PackageJson = function (a) {
       return function (b) {
@@ -11118,24 +11120,70 @@ Elm.HotRod.make = function (_elm) {
    var fieldView = F2(function (key,value) {
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("field")]),
-      _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("field-title")]),_U.list([$Html.text(A2($Basics._op["++"],key,": "))]))
-              ,A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]))]));
+      _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("field-title")]),_U.list([$Html.text(A2($Basics._op["++"],key,": "))])),value]));
    });
-   var repoView = function (_p0) {
+   var linkValue = function (url) {
+      return A2($Html.span,
+      _U.list([$Html$Attributes.$class("field-value")]),
+      _U.list([A2($Html.a,_U.list([$Html$Attributes.href(url)]),_U.list([$Html.text(url)]))]));
+   };
+   var listValue = function (values) {
+      var item = function (str) {    return A2($Html.li,_U.list([]),_U.list([$Html.text(str)]));};
+      return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,item,values));
+   };
+   var stringValue = function (value) {    return A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]));};
+   var listItemValue = F2(function (key,value) {    return A2($Html.li,_U.list([]),_U.list([A2(fieldView,key,stringValue(value))]));});
+   var personValue = function (_p0) {
       var _p1 = _p0;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("field")]),
-      _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("field-title")]),_U.list([$Html.text("Repository: ")]))
-              ,A2($Html.ul,
-              _U.list([$Html$Attributes.$class("sub-field")]),
-              _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",_p1._0)])),A2($Html.li,_U.list([]),_U.list([A2(linkFieldView,"url",_p1._1)]))]))]));
+      return A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sub-field")]),
+      A2($List.filterMap,
+      function (_p2) {
+         var _p3 = _p2;
+         return A2($Maybe.map,listItemValue(_p3._0),_p3._1);
+      },
+      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p1.name},{ctor: "_Tuple2",_0: "Email",_1: _p1.email},{ctor: "_Tuple2",_0: "Url",_1: _p1.url}])));
+   };
+   var directoriesValue = function (_p4) {
+      var _p5 = _p4;
+      return A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sub-field")]),
+      A2($List.filterMap,
+      function (_p6) {
+         var _p7 = _p6;
+         return A2($Maybe.map,listItemValue(_p7._0),_p7._1);
+      },
+      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p5.bin}
+              ,{ctor: "_Tuple2",_0: "Doc",_1: _p5.doc}
+              ,{ctor: "_Tuple2",_0: "Lib",_1: _p5.lib}
+              ,{ctor: "_Tuple2",_0: "Man",_1: _p5.man}
+              ,{ctor: "_Tuple2",_0: "Example",_1: _p5.example}
+              ,{ctor: "_Tuple2",_0: "Tests",_1: _p5.tests}])));
+   };
+   var pairValue = function (_p8) {    var _p9 = _p8;return A2(fieldView,_p9._0,stringValue(_p9._1));};
+   var repoView = function (_p10) {
+      var _p11 = _p10;
+      return A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sub-field")]),
+      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p11._0))]))
+              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p11._1))]))]));
    };
    var packageJsonView = function (pj) {
-      var fields = _U.list([A2($Maybe.map,fieldView("Name"),pj.name)
-                           ,A2($Maybe.map,fieldView("Version"),pj.version)
-                           ,A2($Maybe.map,fieldView("Description"),pj.description)
-                           ,A2($Maybe.map,fieldView("Main"),pj.main)
-                           ,A2($Maybe.map,repoView,pj.repository)]);
+      var fieldDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p12) {    return A2(fieldView,key,valueView(_p12));},value);});
+      var fields = _U.list([A3(fieldDiv,"Name",stringValue,pj.name)
+                           ,A3(fieldDiv,"Version",stringValue,pj.version)
+                           ,A3(fieldDiv,"Description",stringValue,pj.description)
+                           ,A3(fieldDiv,"Main",stringValue,pj.main)
+                           ,A3(fieldDiv,"Keywords",listValue,pj.keywords)
+                           ,A3(fieldDiv,"Repository",repoView,pj.repository)
+                           ,A3(fieldDiv,"Home Page",linkValue,pj.homepage)
+                           ,A3(fieldDiv,"Bugs",stringValue,pj.bugs)
+                           ,A3(fieldDiv,"License",stringValue,pj.license)
+                           ,A3(fieldDiv,"Author",personValue,pj.author)
+                           ,A3(fieldDiv,"Contributors",function (_p13) {    return A2($Html.div,_U.list([]),A2($List.map,personValue,_p13));},pj.contributors)
+                           ,A3(fieldDiv,"Files",listValue,pj.files)
+                           ,A3(fieldDiv,"Man",listValue,pj.man)
+                           ,A3(fieldDiv,"Bin",pairValue,pj.bin)]);
       return A2($Html.div,_U.list([$Html$Attributes.$class("package-json")]),A2($List.filterMap,$Basics.identity,fields));
    };
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
@@ -11151,8 +11199,8 @@ Elm.HotRod.make = function (_elm) {
    });
    var NoOp = {ctor: "NoOp"};
    var decodeContents = function (file) {
-      var _p2 = $String.toLower(function (_) {    return _.extension;}(file));
-      if (_p2 === ".json") {
+      var _p14 = $String.toLower(function (_) {    return _.extension;}(file));
+      if (_p14 === ".json") {
             return _U.eq($String.toLower(function (_) {    return _.name;}(file)),"package.json") ? ReceivePackageJson(function (_) {
                return _.contents;
             }(file)) : NoOp;
@@ -11163,11 +11211,11 @@ Elm.HotRod.make = function (_elm) {
    var receiveFile = function (value) {    return decodeContents($Fs.decode(value));};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p3 = action;
-      switch (_p3.ctor)
+      var _p15 = action;
+      switch (_p15.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p3._0)};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p3._0)}),_1: $Effects.none};}
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p15._0)};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p15._0)}),_1: $Effects.none};}
    });
    var init = {ctor: "_Tuple2",_0: {packageJson: $PackageJson.$default},_1: $Effects.none};
    var Model = function (a) {    return {packageJson: a};};
@@ -11180,6 +11228,13 @@ Elm.HotRod.make = function (_elm) {
                                ,update: update
                                ,view: view
                                ,packageJsonView: packageJsonView
+                               ,stringValue: stringValue
+                               ,listValue: listValue
+                               ,listItemValue: listItemValue
+                               ,linkValue: linkValue
+                               ,pairValue: pairValue
+                               ,personValue: personValue
+                               ,directoriesValue: directoriesValue
                                ,fieldView: fieldView
                                ,linkFieldView: linkFieldView
                                ,repoView: repoView

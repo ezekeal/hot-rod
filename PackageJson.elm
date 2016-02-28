@@ -36,6 +36,7 @@ type alias Directories =
     , lib : Maybe String
     , man : Maybe String
     , example : Maybe String
+    , tests : Maybe String
     }
 
 
@@ -102,8 +103,8 @@ personDecoder =
             { defaultPerson | name = Just str }
     in
         oneOf
-        [ person
-        , string |> map personString
+        [ string |> map personString
+        , person
         ]
 
 directoriesDecoder : Decoder Directories
@@ -114,6 +115,7 @@ directoriesDecoder =
     |: maybe ("lib" := string)
     |: maybe ("man" := string)
     |: maybe ("example" := string)
+    |: maybe ("test" := string)
 
 repositoryDecoder : Decoder (String, String)
 repositoryDecoder =
