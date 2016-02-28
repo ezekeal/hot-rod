@@ -3,6 +3,7 @@ module HotRod where
 import Effects exposing (Effects, Never)
 import Graphics.Element exposing(show)
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Encode
 import String exposing (toLower)
@@ -27,7 +28,6 @@ init =
 type Action
     = NoOp
     | RequestFile String
-    | RequestPackageJson
     | ReceivePackageJson String
 
 update : Action -> Model -> ( Model, Effects Action )
@@ -38,9 +38,6 @@ update action model =
 
         RequestFile filePath ->
             (model, fetchFile filePath)
-
-        RequestPackageJson ->
-            (model, fetchFile "package.json")
 
         ReceivePackageJson value ->
             ( { model | packageJson = (PackageJson.decode value) }
@@ -53,9 +50,53 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
     div [ ]
-        [ button  [ onClick address RequestPackageJson ] [ text "click me" ]
+        [ div [ class "get-package-json" ]
+            [ button
+                [ onClick address (RequestFile "package.json") ]
+                [ text "get package.json" ]
+            ]
+        , packageJsonView model.packageJson
         , div [ ] [ fromElement (show model) ]
         ]
+
+packageJsonView : PackageJson -> Html
+packageJsonView pj =
+    let
+        fields =
+            [ Maybe.map (fieldView "Name") pj.name
+            , Maybe.map (fieldView "Version") pj.version
+            , Maybe.map (fieldView "Description") pj.description
+            , Maybe.map (fieldView "Main") pj.main
+            , Maybe.map repoView pj.repository
+            ]
+    in
+        div [ class "package-json" ]
+            <| List.filterMap identity fields
+
+fieldView : String -> String -> Html
+fieldView key value =
+    div [ class "field" ]
+        [ span [ class "field-title" ] [ text (key ++ ": ") ]
+        , span [ class "field-value" ] [ text value ]
+        ]
+
+linkFieldView : String -> String -> Html
+linkFieldView key url =
+    div [ class "field" ]
+        [ span [ class "field-title" ] [ text (key ++ ": ") ]
+        , span [ class "field-value" ] [ a [ href url ] [ text url ] ]
+        ]
+
+repoView : (String, String) -> Html
+repoView (repoType, url)=
+    div [ class "field" ]
+    [ span [ class "field-title" ] [ text "Repository: " ]
+    , ul [ class "sub-field" ]
+        [ li [ ] [ fieldView "type" repoType ]
+        , li [ ] [ linkFieldView "url" url ]
+        ]
+    ]
+
 
 
 -- Utils

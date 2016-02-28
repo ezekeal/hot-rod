@@ -7,8 +7,8 @@ import String
 -- Types
 
 type alias PackageJson =
-    { name : String
-    , version : String
+    { name : Maybe String
+    , version : Maybe String
     , description : Maybe String
     , keywords : Maybe (List String)
     , homepage : Maybe String
@@ -25,7 +25,7 @@ type alias PackageJson =
     }
 
 type alias Person =
-    { name : String
+    { name : Maybe String
     , email : Maybe String
     , url : Maybe String
     }
@@ -43,8 +43,8 @@ type alias Directories =
 
 default : PackageJson
 default =
-    { name = ""
-    , version = ""
+    { name = Nothing
+    , version = Nothing
     , description = Nothing
     , keywords = Nothing
     , homepage = Nothing
@@ -62,7 +62,7 @@ default =
 
 defaultPerson : Person
 defaultPerson =
-    { name = ""
+    { name = Nothing
     , email = Nothing
     , url = Nothing
     }
@@ -72,8 +72,8 @@ defaultPerson =
 packageJsonDecoder : Decoder PackageJson
 packageJsonDecoder =
     succeed PackageJson
-    |: ("name" := string)
-    |: ("version" := string)
+    |: maybe ("name" := string)
+    |: maybe ("version" := string)
     |: maybe ("description" := string)
     |: maybe ("keywords" := list string)
     |: maybe ("homepage" := string)
@@ -94,12 +94,12 @@ personDecoder =
     let
         person =
             succeed Person
-            |: ("name" := string)
+            |: maybe ("name" := string)
             |: maybe ("email" := string)
             |: maybe ("url" := string)
 
         personString str =
-            { defaultPerson | name = str }
+            { defaultPerson | name = Just str }
     in
         oneOf
         [ person
@@ -118,7 +118,7 @@ directoriesDecoder =
 repositoryDecoder : Decoder (String, String)
 repositoryDecoder =
     oneOf
-    [ string |> map (\n -> ("",n))
+    [ string |> map (\n -> ("git",n))
     , object2 (,)
         ("type" := string)
         ("url" := string)
