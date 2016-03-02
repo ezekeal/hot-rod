@@ -26,6 +26,16 @@ type alias PackageJson =
     , config : Maybe (List (String, String))
     , dependencies : Maybe (List (String, String))
     , devDependencies : Maybe (List (String, String))
+    , peerDependencies : Maybe (List (String, String))
+    , bundeledDependencies : Maybe (List String)
+    , bundeleDependencies : Maybe (List String)
+    , optionalDependencies : Maybe (List (String, String))
+    , engines : Maybe (List (String, String))
+    , os : Maybe (List String)
+    , cpu : Maybe (List String)
+    , preferGlobal : Maybe Bool
+    , private : Maybe Bool
+    , publishConfig : Maybe (List (String,String))
     }
 
 type alias Person =
@@ -67,6 +77,16 @@ default =
     , config = Nothing
     , dependencies = Nothing
     , devDependencies = Nothing
+    , peerDependencies = Nothing
+    , bundeledDependencies = Nothing
+    , bundeleDependencies = Nothing
+    , optionalDependencies = Nothing
+    , engines = Nothing
+    , os = Nothing
+    , cpu = Nothing
+    , preferGlobal = Nothing
+    , private = Nothing
+    , publishConfig = Nothing
     }
 
 defaultPerson : Person
@@ -88,8 +108,8 @@ packageJsonDecoder =
     |: maybe ("homepage" := string)
     |: maybe ("bugs" := string)
     |: maybe ("license" := string)
-    |: maybe ("author" := personDecoder)
-    |: maybe ("contributors" := list personDecoder)
+    |: maybe ("author" := person)
+    |: maybe ("contributors" := list person)
     |: maybe ("files" := list string)
     |: maybe ("main" := string)
     |: maybe ("bin" := stringOrKeyValue)
@@ -100,12 +120,22 @@ packageJsonDecoder =
     |: maybe ("config" := keyValuePairs string)
     |: maybe ("dependencies" := keyValuePairs string)
     |: maybe ("devDependencies" := keyValuePairs string)
+    |: maybe ("peerDependencies" := keyValuePairs string)
+    |: maybe ("bundeledDependencies" := list string)
+    |: maybe ("bundeleDependencies" := list string)
+    |: maybe ("optionalDependencies" := keyValuePairs string)
+    |: maybe ("engines" := keyValuePairs string)
+    |: maybe ("os" := list string)
+    |: maybe ("cpu" := list string)
+    |: maybe ("perferGlobal" := bool)
+    |: maybe ("private" := bool)
+    |: maybe ("publishConfig" := keyValuePairs string)
 
 
-personDecoder : Decoder Person
-personDecoder =
+person : Decoder Person
+person =
     let
-        person =
+        personObj =
             succeed Person
             |: maybe ("name" := string)
             |: maybe ("email" := string)
@@ -116,7 +146,7 @@ personDecoder =
     in
         oneOf
         [ string |> map personString
-        , person
+        , personObj
         ]
 
 directoriesDecoder : Decoder Directories

@@ -1,31 +1,40 @@
 {
-  "name": "hot-rod"
-, "version": "1.0.0"
-, "description": "A gui for npm projects"
-, "keywords":
-    [ "elm"
-    , "electron"
-    , "gui"
-    ]
-, "main": "main.js"
-, "homepage": "github.com/ezekeal"
-, "scripts":
-  { "elm": "elm make Main.elm --warn --output elm.js || true"
-  , "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'"
-  , "start": "electron main.js"
-  , "watch": "npm run start & npm run elm:watch & wait"
-  }
-, "repository":
-  { "type": "git"
-  , "url": "github.com/ezekeal/hot-rod"
-  }
-, "author": { "name": "Zach Koch" }
-, "contributors" : [{"name": "Zach Koch", "email": "ezekeal@gmail.com"}]
-, "license": "UNLICENSED"
-, "dependencies": {}
-,  "devDependencies":
-  { "chokidar-cli": "^1.2.0"
-  , "electron-prebuilt": "^0.36.7"
-  , "elm": "^0.16.0"
+  "name": "hot-rod",
+  "version": "1.0.0",
+  "description": "A gui for npm projects",
+  "keywords": [
+    "elm",
+    "electron",
+    "gui"
+  ],
+  "main": "main.js",
+  "homepage": "http://github.com/ezekeal",
+  "scripts": {
+    "elm": "elm make Main.elm --warn --output elm.js || true",
+    "elm:watch": "chokidar '**/*.elm' -c 'npm run elm'",
+    "start": "electron main.js",
+    "watch": "npm run start & npm run elm:watch & wait"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/ezekeal/hot-rod"
+  },
+  "author": {
+    "name": "Zach Koch"
+  },
+  "contributors": [
+    {
+      "name": "Zach Koch",
+      "email": "ezekeal@gmail.com"
+    }
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "open": "0.0.5"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "electron-prebuilt": "^0.36.7",
+    "elm": "^0.16.0"
   }
 }

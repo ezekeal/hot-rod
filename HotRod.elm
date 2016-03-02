@@ -1,7 +1,6 @@
 module HotRod where
 
 import Effects exposing (Effects, Never)
-import Graphics.Element exposing(show)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -56,7 +55,6 @@ view address model =
                 [ text "get package.json" ]
             ]
         , packageJsonView model.packageJson
-        , div [ ] [ fromElement (show model) ]
         ]
 
 packageJsonView : PackageJson -> Html
@@ -81,8 +79,18 @@ packageJsonView pj =
             , kvDiv "Bin" pairValue pj.bin
             , kvDiv "scripts" (listValue pairValue) pj.scripts
             , kvDiv "config" (listValue pairValue) pj.config
-            , kvDiv "dependencies" (listValue pairValue) pj.dependencies
-            , kvDiv "devDependencies" (listValue pairValue) pj.devDependencies
+            , kvDiv "Dependencies" (listValue pairValue) pj.dependencies
+            , kvDiv "Dev Dependencies" (listValue pairValue) pj.devDependencies
+            , kvDiv "Peer Dependencies" (listValue pairValue) pj.peerDependencies
+            , kvDiv "Bundeled Dependencies" (listValue stringValue) pj.bundeledDependencies
+            , kvDiv "Bundele Dependencies" (listValue stringValue) pj.bundeleDependencies
+            , kvDiv "Optional Dependencies" (listValue pairValue) pj.optionalDependencies
+            , kvDiv "Engines" (listValue pairValue) pj.engines
+            , kvDiv "OS" (listValue stringValue) pj.os
+            , kvDiv "CPU" (listValue stringValue) pj.cpu
+            , kvDiv "Prefer Global" (boolValue) pj.preferGlobal
+            , kvDiv "Private" (boolValue) pj.private
+            , kvDiv "Publish Config" (listValue pairValue) pj.publishConfig
             ]
     in
         div [ class "package-json" ]
@@ -96,6 +104,14 @@ listValue : (a -> Html) -> List a -> Html
 listValue view values =
     ul [ class "sub-field" ]
         <| List.map view values
+
+boolValue: Bool -> Html
+boolValue bl =
+    case bl of
+        True ->
+            stringValue "True"
+        False->
+            stringValue "False"
 
 listItemValue : String -> String -> Html
 listItemValue key value =

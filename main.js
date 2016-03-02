@@ -2,10 +2,10 @@
 
 const electron = require('electron')
 const chokidar = require('chokidar')
+const open = require('open')
 const app = electron.app // Module to control application life.
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
 const nativeImage = electron.nativeImage
-// const Tray = electron.Tray
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -17,6 +17,11 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({icon: appIcon, width: 1024, height: 768})
   mainWindow.setProgressBar(-1)
+
+  mainWindow.webContents.on('will-navigate', (e, url) => {
+    e.preventDefault()
+    open(url)
+  })
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${ __dirname }/index.html`)

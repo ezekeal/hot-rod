@@ -10977,7 +10977,17 @@ Elm.PackageJson.make = function (_elm) {
                   ,scripts: $Maybe.Nothing
                   ,config: $Maybe.Nothing
                   ,dependencies: $Maybe.Nothing
-                  ,devDependencies: $Maybe.Nothing};
+                  ,devDependencies: $Maybe.Nothing
+                  ,peerDependencies: $Maybe.Nothing
+                  ,bundeledDependencies: $Maybe.Nothing
+                  ,bundeleDependencies: $Maybe.Nothing
+                  ,optionalDependencies: $Maybe.Nothing
+                  ,engines: $Maybe.Nothing
+                  ,os: $Maybe.Nothing
+                  ,cpu: $Maybe.Nothing
+                  ,preferGlobal: $Maybe.Nothing
+                  ,$private: $Maybe.Nothing
+                  ,publishConfig: $Maybe.Nothing};
    var Directories = F6(function (a,b,c,d,e,f) {    return {bin: a,doc: b,lib: c,man: d,example: e,tests: f};});
    var directoriesDecoder = A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
@@ -10991,14 +11001,14 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"example",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"test",$Json$Decode.string)));
    var Person = F3(function (a,b,c) {    return {name: a,email: b,url: c};});
-   var personDecoder = function () {
+   var person = function () {
       var personString = function (str) {    return _U.update(defaultPerson,{name: $Maybe.Just(str)});};
-      var person = A2($Json$Decode$Extra._op["|:"],
+      var personObj = A2($Json$Decode$Extra._op["|:"],
       A2($Json$Decode$Extra._op["|:"],
       A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(Person),$Json$Decode.maybe(A2($Json$Decode._op[":="],"name",$Json$Decode.string))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"email",$Json$Decode.string))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"url",$Json$Decode.string)));
-      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,personString,$Json$Decode.string),person]));
+      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,personString,$Json$Decode.string),personObj]));
    }();
    var PackageJson = function (a) {
       return function (b) {
@@ -11019,25 +11029,55 @@ Elm.PackageJson.make = function (_elm) {
                                                    return function (q) {
                                                       return function (r) {
                                                          return function (s) {
-                                                            return {name: a
-                                                                   ,version: b
-                                                                   ,description: c
-                                                                   ,keywords: d
-                                                                   ,homepage: e
-                                                                   ,bugs: f
-                                                                   ,license: g
-                                                                   ,author: h
-                                                                   ,contributors: i
-                                                                   ,files: j
-                                                                   ,main: k
-                                                                   ,bin: l
-                                                                   ,man: m
-                                                                   ,directories: n
-                                                                   ,repository: o
-                                                                   ,scripts: p
-                                                                   ,config: q
-                                                                   ,dependencies: r
-                                                                   ,devDependencies: s};
+                                                            return function (t) {
+                                                               return function (u) {
+                                                                  return function (v) {
+                                                                     return function (w) {
+                                                                        return function (x) {
+                                                                           return function (y) {
+                                                                              return function (z) {
+                                                                                 return function (_1) {
+                                                                                    return function (_2) {
+                                                                                       return function (_3) {
+                                                                                          return {name: a
+                                                                                                 ,version: b
+                                                                                                 ,description: c
+                                                                                                 ,keywords: d
+                                                                                                 ,homepage: e
+                                                                                                 ,bugs: f
+                                                                                                 ,license: g
+                                                                                                 ,author: h
+                                                                                                 ,contributors: i
+                                                                                                 ,files: j
+                                                                                                 ,main: k
+                                                                                                 ,bin: l
+                                                                                                 ,man: m
+                                                                                                 ,directories: n
+                                                                                                 ,repository: o
+                                                                                                 ,scripts: p
+                                                                                                 ,config: q
+                                                                                                 ,dependencies: r
+                                                                                                 ,devDependencies: s
+                                                                                                 ,peerDependencies: t
+                                                                                                 ,bundeledDependencies: u
+                                                                                                 ,bundeleDependencies: v
+                                                                                                 ,optionalDependencies: w
+                                                                                                 ,engines: x
+                                                                                                 ,os: y
+                                                                                                 ,cpu: z
+                                                                                                 ,preferGlobal: _1
+                                                                                                 ,$private: _2
+                                                                                                 ,publishConfig: _3};
+                                                                                       };
+                                                                                    };
+                                                                                 };
+                                                                              };
+                                                                           };
+                                                                        };
+                                                                     };
+                                                                  };
+                                                               };
+                                                            };
                                                          };
                                                       };
                                                    };
@@ -11075,6 +11115,16 @@ Elm.PackageJson.make = function (_elm) {
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(PackageJson),$Json$Decode.maybe(A2($Json$Decode._op[":="],"name",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"version",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string))),
@@ -11082,8 +11132,8 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"homepage",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"bugs",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"license",$Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"author",personDecoder))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"contributors",$Json$Decode.list(personDecoder)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"author",person))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"contributors",$Json$Decode.list(person)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"files",$Json$Decode.list($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"main",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",stringOrKeyValue))),
@@ -11093,7 +11143,17 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"scripts",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"config",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"dependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"devDependencies",$Json$Decode.keyValuePairs($Json$Decode.string))));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"devDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"peerDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundeledDependencies",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundeleDependencies",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"optionalDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"engines",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"os",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"cpu",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"perferGlobal",$Json$Decode.bool))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"private",$Json$Decode.bool))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"publishConfig",$Json$Decode.keyValuePairs($Json$Decode.string))));
    var decode = function (value) {    return A2($Result.withDefault,$default,A2($Json$Decode.decodeString,packageJsonDecoder,value));};
    return _elm.PackageJson.values = {_op: _op
                                     ,PackageJson: PackageJson
@@ -11102,7 +11162,7 @@ Elm.PackageJson.make = function (_elm) {
                                     ,$default: $default
                                     ,defaultPerson: defaultPerson
                                     ,packageJsonDecoder: packageJsonDecoder
-                                    ,personDecoder: personDecoder
+                                    ,person: person
                                     ,directoriesDecoder: directoriesDecoder
                                     ,repositoryDecoder: repositoryDecoder
                                     ,stringOrKeyValue: stringOrKeyValue
@@ -11120,7 +11180,6 @@ Elm.HotRod.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Fs = Elm.Fs.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
@@ -11153,44 +11212,45 @@ Elm.HotRod.make = function (_elm) {
    };
    var listValue = F2(function (view,values) {    return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,view,values));});
    var stringValue = function (value) {    return A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]));};
+   var boolValue = function (bl) {    var _p0 = bl;if (_p0 === true) {    return stringValue("True");} else {    return stringValue("False");}};
    var listItemValue = F2(function (key,value) {    return A2($Html.li,_U.list([]),_U.list([A2(fieldView,key,stringValue(value))]));});
-   var personValue = function (_p0) {
-      var _p1 = _p0;
+   var personValue = function (_p1) {
+      var _p2 = _p1;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
       A2($List.filterMap,
-      function (_p2) {
-         var _p3 = _p2;
-         return A2($Maybe.map,listItemValue(_p3._0),_p3._1);
+      function (_p3) {
+         var _p4 = _p3;
+         return A2($Maybe.map,listItemValue(_p4._0),_p4._1);
       },
-      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p1.name},{ctor: "_Tuple2",_0: "Email",_1: _p1.email},{ctor: "_Tuple2",_0: "Url",_1: _p1.url}])));
+      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p2.name},{ctor: "_Tuple2",_0: "Email",_1: _p2.email},{ctor: "_Tuple2",_0: "Url",_1: _p2.url}])));
    };
-   var directoriesValue = function (_p4) {
-      var _p5 = _p4;
+   var directoriesValue = function (_p5) {
+      var _p6 = _p5;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
       A2($List.filterMap,
-      function (_p6) {
-         var _p7 = _p6;
-         return A2($Maybe.map,listItemValue(_p7._0),_p7._1);
+      function (_p7) {
+         var _p8 = _p7;
+         return A2($Maybe.map,listItemValue(_p8._0),_p8._1);
       },
-      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p5.bin}
-              ,{ctor: "_Tuple2",_0: "Doc",_1: _p5.doc}
-              ,{ctor: "_Tuple2",_0: "Lib",_1: _p5.lib}
-              ,{ctor: "_Tuple2",_0: "Man",_1: _p5.man}
-              ,{ctor: "_Tuple2",_0: "Example",_1: _p5.example}
-              ,{ctor: "_Tuple2",_0: "Tests",_1: _p5.tests}])));
+      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p6.bin}
+              ,{ctor: "_Tuple2",_0: "Doc",_1: _p6.doc}
+              ,{ctor: "_Tuple2",_0: "Lib",_1: _p6.lib}
+              ,{ctor: "_Tuple2",_0: "Man",_1: _p6.man}
+              ,{ctor: "_Tuple2",_0: "Example",_1: _p6.example}
+              ,{ctor: "_Tuple2",_0: "Tests",_1: _p6.tests}])));
    };
-   var pairValue = function (_p8) {    var _p9 = _p8;return A2(fieldView,_p9._0,stringValue(_p9._1));};
-   var repoView = function (_p10) {
-      var _p11 = _p10;
+   var pairValue = function (_p9) {    var _p10 = _p9;return A2(fieldView,_p10._0,stringValue(_p10._1));};
+   var repoView = function (_p11) {
+      var _p12 = _p11;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
-      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p11._0))]))
-              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p11._1))]))]));
+      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p12._0))]))
+              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p12._1))]))]));
    };
    var packageJsonView = function (pj) {
-      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p12) {    return A2(fieldView,key,valueView(_p12));},value);});
+      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p13) {    return A2(fieldView,key,valueView(_p13));},value);});
       var fields = _U.list([A3(kvDiv,"Name",stringValue,pj.name)
                            ,A3(kvDiv,"Version",stringValue,pj.version)
                            ,A3(kvDiv,"Description",stringValue,pj.description)
@@ -11207,8 +11267,18 @@ Elm.HotRod.make = function (_elm) {
                            ,A3(kvDiv,"Bin",pairValue,pj.bin)
                            ,A3(kvDiv,"scripts",listValue(pairValue),pj.scripts)
                            ,A3(kvDiv,"config",listValue(pairValue),pj.config)
-                           ,A3(kvDiv,"dependencies",listValue(pairValue),pj.dependencies)
-                           ,A3(kvDiv,"devDependencies",listValue(pairValue),pj.devDependencies)]);
+                           ,A3(kvDiv,"Dependencies",listValue(pairValue),pj.dependencies)
+                           ,A3(kvDiv,"Dev Dependencies",listValue(pairValue),pj.devDependencies)
+                           ,A3(kvDiv,"Peer Dependencies",listValue(pairValue),pj.peerDependencies)
+                           ,A3(kvDiv,"Bundeled Dependencies",listValue(stringValue),pj.bundeledDependencies)
+                           ,A3(kvDiv,"Bundele Dependencies",listValue(stringValue),pj.bundeleDependencies)
+                           ,A3(kvDiv,"Optional Dependencies",listValue(pairValue),pj.optionalDependencies)
+                           ,A3(kvDiv,"Engines",listValue(pairValue),pj.engines)
+                           ,A3(kvDiv,"OS",listValue(stringValue),pj.os)
+                           ,A3(kvDiv,"CPU",listValue(stringValue),pj.cpu)
+                           ,A3(kvDiv,"Prefer Global",boolValue,pj.preferGlobal)
+                           ,A3(kvDiv,"Private",boolValue,pj.$private)
+                           ,A3(kvDiv,"Publish Config",listValue(pairValue),pj.publishConfig)]);
       return A2($Html.div,_U.list([$Html$Attributes.$class("package-json")]),A2($List.filterMap,$Basics.identity,fields));
    };
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
@@ -11219,13 +11289,12 @@ Elm.HotRod.make = function (_elm) {
       _U.list([A2($Html.div,
               _U.list([$Html$Attributes.$class("get-package-json")]),
               _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,RequestFile("package.json"))]),_U.list([$Html.text("get package.json")]))]))
-              ,packageJsonView(model.packageJson)
-              ,A2($Html.div,_U.list([]),_U.list([$Html.fromElement($Graphics$Element.show(model))]))]));
+              ,packageJsonView(model.packageJson)]));
    });
    var NoOp = {ctor: "NoOp"};
    var decodeContents = function (file) {
-      var _p13 = $String.toLower(function (_) {    return _.extension;}(file));
-      if (_p13 === ".json") {
+      var _p14 = $String.toLower(function (_) {    return _.extension;}(file));
+      if (_p14 === ".json") {
             return _U.eq($String.toLower(function (_) {    return _.name;}(file)),"package.json") ? ReceivePackageJson(function (_) {
                return _.contents;
             }(file)) : NoOp;
@@ -11236,11 +11305,11 @@ Elm.HotRod.make = function (_elm) {
    var receiveFile = function (value) {    return decodeContents($Fs.decode(value));};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p14 = action;
-      switch (_p14.ctor)
+      var _p15 = action;
+      switch (_p15.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p14._0)};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p14._0)}),_1: $Effects.none};}
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p15._0)};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p15._0)}),_1: $Effects.none};}
    });
    var init = {ctor: "_Tuple2",_0: {packageJson: $PackageJson.$default},_1: $Effects.none};
    var Model = function (a) {    return {packageJson: a};};
@@ -11255,6 +11324,7 @@ Elm.HotRod.make = function (_elm) {
                                ,packageJsonView: packageJsonView
                                ,stringValue: stringValue
                                ,listValue: listValue
+                               ,boolValue: boolValue
                                ,listItemValue: listItemValue
                                ,linkValue: linkValue
                                ,pairValue: pairValue
