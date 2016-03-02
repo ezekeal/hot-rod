@@ -22,6 +22,7 @@ type alias PackageJson =
     , man : Maybe (List String)
     , directories : Maybe Directories
     , repository : Maybe (String,String)
+    , scripts : Maybe (List (String, String))
     }
 
 type alias Person =
@@ -59,6 +60,7 @@ default =
     , man = Nothing
     , directories = Nothing
     , repository = Nothing
+    , scripts = Nothing
     }
 
 defaultPerson : Person
@@ -88,6 +90,7 @@ packageJsonDecoder =
     |: maybe ("man" := stringOrListString)
     |: maybe ("directories" := directoriesDecoder)
     |: maybe ("repository" := repositoryDecoder)
+    |: maybe ("scripts" := keyValuePairs string)
 
 
 personDecoder : Decoder Person

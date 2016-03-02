@@ -10973,7 +10973,8 @@ Elm.PackageJson.make = function (_elm) {
                   ,bin: $Maybe.Nothing
                   ,man: $Maybe.Nothing
                   ,directories: $Maybe.Nothing
-                  ,repository: $Maybe.Nothing};
+                  ,repository: $Maybe.Nothing
+                  ,scripts: $Maybe.Nothing};
    var Directories = F6(function (a,b,c,d,e,f) {    return {bin: a,doc: b,lib: c,man: d,example: e,tests: f};});
    var directoriesDecoder = A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
@@ -11011,21 +11012,24 @@ Elm.PackageJson.make = function (_elm) {
                                        return function (m) {
                                           return function (n) {
                                              return function (o) {
-                                                return {name: a
-                                                       ,version: b
-                                                       ,description: c
-                                                       ,keywords: d
-                                                       ,homepage: e
-                                                       ,bugs: f
-                                                       ,license: g
-                                                       ,author: h
-                                                       ,contributors: i
-                                                       ,files: j
-                                                       ,main: k
-                                                       ,bin: l
-                                                       ,man: m
-                                                       ,directories: n
-                                                       ,repository: o};
+                                                return function (p) {
+                                                   return {name: a
+                                                          ,version: b
+                                                          ,description: c
+                                                          ,keywords: d
+                                                          ,homepage: e
+                                                          ,bugs: f
+                                                          ,license: g
+                                                          ,author: h
+                                                          ,contributors: i
+                                                          ,files: j
+                                                          ,main: k
+                                                          ,bin: l
+                                                          ,man: m
+                                                          ,directories: n
+                                                          ,repository: o
+                                                          ,scripts: p};
+                                                };
                                              };
                                           };
                                        };
@@ -11055,6 +11059,7 @@ Elm.PackageJson.make = function (_elm) {
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(PackageJson),$Json$Decode.maybe(A2($Json$Decode._op[":="],"name",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"version",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string))),
@@ -11069,7 +11074,8 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"bin",stringOrKeyValue))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",stringOrListString))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"directories",directoriesDecoder))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"repository",repositoryDecoder)));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"repository",repositoryDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"scripts",$Json$Decode.keyValuePairs($Json$Decode.string))));
    var decode = function (value) {    return A2($Result.withDefault,$default,A2($Json$Decode.decodeString,packageJsonDecoder,value));};
    return _elm.PackageJson.values = {_op: _op
                                     ,PackageJson: PackageJson
@@ -11127,10 +11133,7 @@ Elm.HotRod.make = function (_elm) {
       _U.list([$Html$Attributes.$class("field-value")]),
       _U.list([A2($Html.a,_U.list([$Html$Attributes.href(url)]),_U.list([$Html.text(url)]))]));
    };
-   var listValue = function (values) {
-      var item = function (str) {    return A2($Html.li,_U.list([]),_U.list([$Html.text(str)]));};
-      return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,item,values));
-   };
+   var listValue = F2(function (view,values) {    return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,view,values));});
    var stringValue = function (value) {    return A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]));};
    var listItemValue = F2(function (key,value) {    return A2($Html.li,_U.list([]),_U.list([A2(fieldView,key,stringValue(value))]));});
    var personValue = function (_p0) {
@@ -11169,21 +11172,22 @@ Elm.HotRod.make = function (_elm) {
               ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p11._1))]))]));
    };
    var packageJsonView = function (pj) {
-      var fieldDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p12) {    return A2(fieldView,key,valueView(_p12));},value);});
-      var fields = _U.list([A3(fieldDiv,"Name",stringValue,pj.name)
-                           ,A3(fieldDiv,"Version",stringValue,pj.version)
-                           ,A3(fieldDiv,"Description",stringValue,pj.description)
-                           ,A3(fieldDiv,"Main",stringValue,pj.main)
-                           ,A3(fieldDiv,"Keywords",listValue,pj.keywords)
-                           ,A3(fieldDiv,"Repository",repoView,pj.repository)
-                           ,A3(fieldDiv,"Home Page",linkValue,pj.homepage)
-                           ,A3(fieldDiv,"Bugs",stringValue,pj.bugs)
-                           ,A3(fieldDiv,"License",stringValue,pj.license)
-                           ,A3(fieldDiv,"Author",personValue,pj.author)
-                           ,A3(fieldDiv,"Contributors",function (_p13) {    return A2($Html.div,_U.list([]),A2($List.map,personValue,_p13));},pj.contributors)
-                           ,A3(fieldDiv,"Files",listValue,pj.files)
-                           ,A3(fieldDiv,"Man",listValue,pj.man)
-                           ,A3(fieldDiv,"Bin",pairValue,pj.bin)]);
+      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p12) {    return A2(fieldView,key,valueView(_p12));},value);});
+      var fields = _U.list([A3(kvDiv,"Name",stringValue,pj.name)
+                           ,A3(kvDiv,"Version",stringValue,pj.version)
+                           ,A3(kvDiv,"Description",stringValue,pj.description)
+                           ,A3(kvDiv,"Main",stringValue,pj.main)
+                           ,A3(kvDiv,"Keywords",listValue(stringValue),pj.keywords)
+                           ,A3(kvDiv,"Repository",repoView,pj.repository)
+                           ,A3(kvDiv,"Home Page",linkValue,pj.homepage)
+                           ,A3(kvDiv,"Bugs",stringValue,pj.bugs)
+                           ,A3(kvDiv,"License",stringValue,pj.license)
+                           ,A3(kvDiv,"Author",personValue,pj.author)
+                           ,A3(kvDiv,"Contributors",listValue(personValue),pj.contributors)
+                           ,A3(kvDiv,"Files",listValue(stringValue),pj.files)
+                           ,A3(kvDiv,"Man",listValue(stringValue),pj.man)
+                           ,A3(kvDiv,"Bin",pairValue,pj.bin)
+                           ,A3(kvDiv,"scripts",listValue(pairValue),pj.scripts)]);
       return A2($Html.div,_U.list([$Html$Attributes.$class("package-json")]),A2($List.filterMap,$Basics.identity,fields));
    };
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
@@ -11199,8 +11203,8 @@ Elm.HotRod.make = function (_elm) {
    });
    var NoOp = {ctor: "NoOp"};
    var decodeContents = function (file) {
-      var _p14 = $String.toLower(function (_) {    return _.extension;}(file));
-      if (_p14 === ".json") {
+      var _p13 = $String.toLower(function (_) {    return _.extension;}(file));
+      if (_p13 === ".json") {
             return _U.eq($String.toLower(function (_) {    return _.name;}(file)),"package.json") ? ReceivePackageJson(function (_) {
                return _.contents;
             }(file)) : NoOp;
@@ -11211,11 +11215,11 @@ Elm.HotRod.make = function (_elm) {
    var receiveFile = function (value) {    return decodeContents($Fs.decode(value));};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p15 = action;
-      switch (_p15.ctor)
+      var _p14 = action;
+      switch (_p14.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p15._0)};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p15._0)}),_1: $Effects.none};}
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p14._0)};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p14._0)}),_1: $Effects.none};}
    });
    var init = {ctor: "_Tuple2",_0: {packageJson: $PackageJson.$default},_1: $Effects.none};
    var Model = function (a) {    return {packageJson: a};};

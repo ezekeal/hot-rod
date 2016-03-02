@@ -62,23 +62,24 @@ view address model =
 packageJsonView : PackageJson -> Html
 packageJsonView pj =
     let
-        fieldDiv key valueView value =
+        kvDiv key valueView value =
             Maybe.map (valueView >> fieldView key) value
         fields =
-            [ fieldDiv "Name" stringValue pj.name
-            , fieldDiv "Version" stringValue pj.version
-            , fieldDiv "Description" stringValue pj.description
-            , fieldDiv "Main" stringValue pj.main
-            , fieldDiv "Keywords" listValue pj.keywords
-            , fieldDiv "Repository" repoView pj.repository
-            , fieldDiv "Home Page" linkValue pj.homepage
-            , fieldDiv "Bugs" stringValue pj.bugs
-            , fieldDiv "License" stringValue pj.license
-            , fieldDiv "Author" personValue pj.author
-            , fieldDiv "Contributors" (List.map personValue >> div [ ]) pj.contributors
-            , fieldDiv "Files" listValue pj.files
-            , fieldDiv "Man" listValue pj.man
-            , fieldDiv "Bin" pairValue pj.bin
+            [ kvDiv "Name" stringValue pj.name
+            , kvDiv "Version" stringValue pj.version
+            , kvDiv "Description" stringValue pj.description
+            , kvDiv "Main" stringValue pj.main
+            , kvDiv "Keywords" (listValue stringValue) pj.keywords
+            , kvDiv "Repository" repoView pj.repository
+            , kvDiv "Home Page" linkValue pj.homepage
+            , kvDiv "Bugs" stringValue pj.bugs
+            , kvDiv "License" stringValue pj.license
+            , kvDiv "Author" personValue pj.author
+            , kvDiv "Contributors" (listValue personValue) pj.contributors
+            , kvDiv "Files" (listValue stringValue) pj.files
+            , kvDiv "Man" (listValue stringValue) pj.man
+            , kvDiv "Bin" pairValue pj.bin
+            , kvDiv "scripts" (listValue pairValue) pj.scripts
             ]
     in
         div [ class "package-json" ]
@@ -88,14 +89,12 @@ stringValue : String -> Html
 stringValue value =
     span [ class "field-value" ] [ text value ]
 
-listValue : List String -> Html
-listValue values =
-    let item str =
-        li [ ] [ text str ]
-    in
-        ul  [ class "sub-field" ]
-            <| List.map item values
+listValue : (a -> Html) -> List a -> Html
+listValue view values =
+    ul [ class "sub-field" ]
+        <| List.map view values
 
+listItemValue : String -> String -> Html
 listItemValue key value =
     li [ ] [ fieldView key <| stringValue value ]
 
