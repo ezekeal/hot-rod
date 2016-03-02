@@ -80,6 +80,9 @@ packageJsonView pj =
             , kvDiv "Man" (listValue stringValue) pj.man
             , kvDiv "Bin" pairValue pj.bin
             , kvDiv "scripts" (listValue pairValue) pj.scripts
+            , kvDiv "config" (listValue pairValue) pj.config
+            , kvDiv "dependencies" (listValue pairValue) pj.dependencies
+            , kvDiv "devDependencies" (listValue pairValue) pj.devDependencies
             ]
     in
         div [ class "package-json" ]

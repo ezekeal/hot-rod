@@ -10974,7 +10974,10 @@ Elm.PackageJson.make = function (_elm) {
                   ,man: $Maybe.Nothing
                   ,directories: $Maybe.Nothing
                   ,repository: $Maybe.Nothing
-                  ,scripts: $Maybe.Nothing};
+                  ,scripts: $Maybe.Nothing
+                  ,config: $Maybe.Nothing
+                  ,dependencies: $Maybe.Nothing
+                  ,devDependencies: $Maybe.Nothing};
    var Directories = F6(function (a,b,c,d,e,f) {    return {bin: a,doc: b,lib: c,man: d,example: e,tests: f};});
    var directoriesDecoder = A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
@@ -11013,22 +11016,31 @@ Elm.PackageJson.make = function (_elm) {
                                           return function (n) {
                                              return function (o) {
                                                 return function (p) {
-                                                   return {name: a
-                                                          ,version: b
-                                                          ,description: c
-                                                          ,keywords: d
-                                                          ,homepage: e
-                                                          ,bugs: f
-                                                          ,license: g
-                                                          ,author: h
-                                                          ,contributors: i
-                                                          ,files: j
-                                                          ,main: k
-                                                          ,bin: l
-                                                          ,man: m
-                                                          ,directories: n
-                                                          ,repository: o
-                                                          ,scripts: p};
+                                                   return function (q) {
+                                                      return function (r) {
+                                                         return function (s) {
+                                                            return {name: a
+                                                                   ,version: b
+                                                                   ,description: c
+                                                                   ,keywords: d
+                                                                   ,homepage: e
+                                                                   ,bugs: f
+                                                                   ,license: g
+                                                                   ,author: h
+                                                                   ,contributors: i
+                                                                   ,files: j
+                                                                   ,main: k
+                                                                   ,bin: l
+                                                                   ,man: m
+                                                                   ,directories: n
+                                                                   ,repository: o
+                                                                   ,scripts: p
+                                                                   ,config: q
+                                                                   ,dependencies: r
+                                                                   ,devDependencies: s};
+                                                         };
+                                                      };
+                                                   };
                                                 };
                                              };
                                           };
@@ -11060,6 +11072,9 @@ Elm.PackageJson.make = function (_elm) {
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
+   A2($Json$Decode$Extra._op["|:"],
    A2($Json$Decode$Extra._op["|:"],$Json$Decode.succeed(PackageJson),$Json$Decode.maybe(A2($Json$Decode._op[":="],"name",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"version",$Json$Decode.string))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string))),
@@ -11075,7 +11090,10 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"man",stringOrListString))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"directories",directoriesDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"repository",repositoryDecoder))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"scripts",$Json$Decode.keyValuePairs($Json$Decode.string))));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"scripts",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"config",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"dependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"devDependencies",$Json$Decode.keyValuePairs($Json$Decode.string))));
    var decode = function (value) {    return A2($Result.withDefault,$default,A2($Json$Decode.decodeString,packageJsonDecoder,value));};
    return _elm.PackageJson.values = {_op: _op
                                     ,PackageJson: PackageJson
@@ -11187,7 +11205,10 @@ Elm.HotRod.make = function (_elm) {
                            ,A3(kvDiv,"Files",listValue(stringValue),pj.files)
                            ,A3(kvDiv,"Man",listValue(stringValue),pj.man)
                            ,A3(kvDiv,"Bin",pairValue,pj.bin)
-                           ,A3(kvDiv,"scripts",listValue(pairValue),pj.scripts)]);
+                           ,A3(kvDiv,"scripts",listValue(pairValue),pj.scripts)
+                           ,A3(kvDiv,"config",listValue(pairValue),pj.config)
+                           ,A3(kvDiv,"dependencies",listValue(pairValue),pj.dependencies)
+                           ,A3(kvDiv,"devDependencies",listValue(pairValue),pj.devDependencies)]);
       return A2($Html.div,_U.list([$Html$Attributes.$class("package-json")]),A2($List.filterMap,$Basics.identity,fields));
    };
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};

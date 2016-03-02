@@ -23,6 +23,9 @@ type alias PackageJson =
     , directories : Maybe Directories
     , repository : Maybe (String,String)
     , scripts : Maybe (List (String, String))
+    , config : Maybe (List (String, String))
+    , dependencies : Maybe (List (String, String))
+    , devDependencies : Maybe (List (String, String))
     }
 
 type alias Person =
@@ -61,6 +64,9 @@ default =
     , directories = Nothing
     , repository = Nothing
     , scripts = Nothing
+    , config = Nothing
+    , dependencies = Nothing
+    , devDependencies = Nothing
     }
 
 defaultPerson : Person
@@ -91,6 +97,9 @@ packageJsonDecoder =
     |: maybe ("directories" := directoriesDecoder)
     |: maybe ("repository" := repositoryDecoder)
     |: maybe ("scripts" := keyValuePairs string)
+    |: maybe ("config" := keyValuePairs string)
+    |: maybe ("dependencies" := keyValuePairs string)
+    |: maybe ("devDependencies" := keyValuePairs string)
 
 
 personDecoder : Decoder Person
