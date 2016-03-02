@@ -6,6 +6,8 @@ const open = require('open')
 const app = electron.app // Module to control application life.
 const BrowserWindow = electron.BrowserWindow // Module to create native browser window.
 const nativeImage = electron.nativeImage
+const dialog = electron.dialog
+const ipcMain = electron.ipcMain
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -37,6 +39,14 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+ipcMain.on('get-file', (event) => {
+  let path = dialog.showOpenDialog({
+    properties: [ 'openFile' ],
+    filters: [{ name: 'JSON', extensions: ['json'] }]
+  })
+  event.returnValue = path
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
