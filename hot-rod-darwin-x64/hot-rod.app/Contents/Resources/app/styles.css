@@ -1,0 +1,81 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+
+/*
+  red: #CB3837
+  border red: #B83130
+*/
+
+body {
+  font-family: 'Source Sans Pro', 'Lucida Grande', sans-serif
+}
+
+ul {
+  list-style-type: none;
+}
+
+button {
+  border-radius: 4px;
+  background: #cb3837;
+  cursor: pointer;
+  color: #fff;
+  margin: 0 0 0.1rem;
+  padding: 0.4rem 1rem;
+  border: 0;
+  width: 100%;
+  font-size: 0.9rem
+}
+
+button:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+a {
+  text-decoration: none;
+  color: #cb3837;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.get-package-json {
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 0.6rem;
+}
+
+.field .sub-field {
+  margin: 0;
+}
+
+.field .sub-field .field-title {
+
+}
+
+.field .field-title {
+  font-weight: 600;
+}
+
+.field .field-value {
+  color: rgba(0, 0, 0, 0.8)
+}
+
+.error-message {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  color: red;
+  background-color: pink;
+  border-radius: 0.5rem;
+  border: 1px solid red;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.error-message:hover {
+  opacity: 0.8;
+}
