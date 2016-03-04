@@ -13,11 +13,19 @@ import Fs exposing (File)
 -- MODEL
 
 type alias Model =
-    { packageJson: PackageJson }
+    { packageJson: PackageJson
+    , error: Maybe String
+    }
+
+initialModel : Model
+initialModel =
+    { packageJson = PackageJson.default
+    , error = Nothing
+    }
 
 init : (Model, Effects Action)
 init =
-    ( { packageJson = PackageJson.default }
+    ( initialModel
     , Effects.none
     )
 
@@ -28,6 +36,8 @@ type Action
     = NoOp
     | RequestFile String
     | ReceivePackageJson String
+    | FileError (Maybe String)
+    | CloseError
 
 update : Action -> Model -> ( Model, Effects Action )
 update action model =
@@ -43,19 +53,41 @@ update action model =
             , Effects.none
             )
 
+        FileError str ->
+            ( { model | error = str }
+            , Effects.none
+            )
+
+        CloseError ->
+            ({ model | error = Nothing}
+            , Effects.none
+            )
+
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
     div [ ]
-        [ div [ class "get-package-json" ]
+        [ errorView address model.error
+        , div [ class "get-package-json" ]
             [ button
                 [ onClick address (RequestFile "package.json") ]
                 [ text "get package.json" ]
             ]
         , packageJsonView model.packageJson
         ]
+
+errorView : Signal.Address Action -> Maybe String -> Html
+errorView address error =
+    case error of
+        Just value ->
+            div [ class "error-message"
+                , onClick address CloseError
+                ]
+                [ text value ]
+        Nothing ->
+            span [ ] [ ]
 
 packageJsonView : PackageJson -> Html
 packageJsonView pj =
@@ -170,13 +202,12 @@ receiveFile value =
 
 decodeContents : File -> Action
 decodeContents file =
-    case toLower (.extension file) of
-        ".json" ->
-            if toLower (.name file) == "package.json" then
-                ReceivePackageJson (.contents file)
-            else NoOp
+    case toLower (.name file) of
+        "package.json" ->
+            ReceivePackageJson (.contents file)
 
-        _ -> NoOp
+        _ ->
+            FileError <| Just "File not recognized"
 
 fetchFile : String -> Effects Action
 fetchFile filePath =

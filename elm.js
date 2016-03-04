@@ -11281,46 +11281,62 @@ Elm.HotRod.make = function (_elm) {
                            ,A3(kvDiv,"Publish Config",listValue(pairValue),pj.publishConfig)]);
       return A2($Html.div,_U.list([$Html$Attributes.$class("package-json")]),A2($List.filterMap,$Basics.identity,fields));
    };
+   var CloseError = {ctor: "CloseError"};
+   var errorView = F2(function (address,error) {
+      var _p14 = error;
+      if (_p14.ctor === "Just") {
+            return A2($Html.div,_U.list([$Html$Attributes.$class("error-message"),A2($Html$Events.onClick,address,CloseError)]),_U.list([$Html.text(_p14._0)]));
+         } else {
+            return A2($Html.span,_U.list([]),_U.list([]));
+         }
+   });
+   var FileError = function (a) {    return {ctor: "FileError",_0: a};};
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
+   var decodeContents = function (file) {
+      var _p15 = $String.toLower(function (_) {    return _.name;}(file));
+      if (_p15 === "package.json") {
+            return ReceivePackageJson(function (_) {    return _.contents;}(file));
+         } else {
+            return FileError($Maybe.Just("File not recognized"));
+         }
+   };
+   var receiveFile = function (value) {    return decodeContents($Fs.decode(value));};
    var RequestFile = function (a) {    return {ctor: "RequestFile",_0: a};};
    var view = F2(function (address,model) {
       return A2($Html.div,
       _U.list([]),
-      _U.list([A2($Html.div,
+      _U.list([A2(errorView,address,model.error)
+              ,A2($Html.div,
               _U.list([$Html$Attributes.$class("get-package-json")]),
               _U.list([A2($Html.button,_U.list([A2($Html$Events.onClick,address,RequestFile("package.json"))]),_U.list([$Html.text("get package.json")]))]))
               ,packageJsonView(model.packageJson)]));
    });
    var NoOp = {ctor: "NoOp"};
-   var decodeContents = function (file) {
-      var _p14 = $String.toLower(function (_) {    return _.extension;}(file));
-      if (_p14 === ".json") {
-            return _U.eq($String.toLower(function (_) {    return _.name;}(file)),"package.json") ? ReceivePackageJson(function (_) {
-               return _.contents;
-            }(file)) : NoOp;
-         } else {
-            return NoOp;
-         }
-   };
-   var receiveFile = function (value) {    return decodeContents($Fs.decode(value));};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p15 = action;
-      switch (_p15.ctor)
+      var _p16 = action;
+      switch (_p16.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p15._0)};
-         default: return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p15._0)}),_1: $Effects.none};}
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p16._0)};
+         case "ReceivePackageJson": return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p16._0)}),_1: $Effects.none};
+         case "FileError": return {ctor: "_Tuple2",_0: _U.update(model,{error: _p16._0}),_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: _U.update(model,{error: $Maybe.Nothing}),_1: $Effects.none};}
    });
-   var init = {ctor: "_Tuple2",_0: {packageJson: $PackageJson.$default},_1: $Effects.none};
-   var Model = function (a) {    return {packageJson: a};};
+   var initialModel = {packageJson: $PackageJson.$default,error: $Maybe.Nothing};
+   var init = {ctor: "_Tuple2",_0: initialModel,_1: $Effects.none};
+   var Model = F2(function (a,b) {    return {packageJson: a,error: b};});
    return _elm.HotRod.values = {_op: _op
                                ,Model: Model
+                               ,initialModel: initialModel
                                ,init: init
                                ,NoOp: NoOp
                                ,RequestFile: RequestFile
                                ,ReceivePackageJson: ReceivePackageJson
+                               ,FileError: FileError
+                               ,CloseError: CloseError
                                ,update: update
                                ,view: view
+                               ,errorView: errorView
                                ,packageJsonView: packageJsonView
                                ,stringValue: stringValue
                                ,listValue: listValue
@@ -11357,9 +11373,18 @@ Elm.Main.make = function (_elm) {
    $StartApp = Elm.StartApp.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
+   var fileError = Elm.Native.Port.make(_elm).inboundSignal("fileError",
+   "Maybe.Maybe String",
+   function (v) {
+      return v === null ? Elm.Maybe.make(_elm).Nothing : Elm.Maybe.make(_elm).Just(typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",
+      v));
+   });
    var file = Elm.Native.Port.make(_elm).inboundSignal("file","Json.Encode.Value",function (v) {    return v;});
    var fetchFile = Elm.Native.Port.make(_elm).outboundSignal("fetchFile",function (v) {    return v;},$HotRod.fetchFileBox.signal);
-   var app = $StartApp.start({init: $HotRod.init,update: $HotRod.update,view: $HotRod.view,inputs: _U.list([A2($Signal.map,$HotRod.receiveFile,file)])});
+   var app = $StartApp.start({init: $HotRod.init
+                             ,update: $HotRod.update
+                             ,view: $HotRod.view
+                             ,inputs: _U.list([A2($Signal.map,$HotRod.receiveFile,file),A2($Signal.map,$HotRod.FileError,fileError)])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    return _elm.Main.values = {_op: _op,app: app,main: main};

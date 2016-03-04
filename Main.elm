@@ -12,7 +12,9 @@ app =
         , update = update
         , view = view
         , inputs =
-            [ Signal.map receiveFile file ]
+            [ Signal.map receiveFile file
+            , Signal.map HotRod.FileError fileError
+            ]
         }
 
 main : Signal Html.Html
@@ -31,3 +33,5 @@ port fetchFile =
     fetchFileBox.signal
 
 port file : Signal Json.Encode.Value
+
+port fileError : Signal (Maybe String)

@@ -8,7 +8,8 @@ const ipcRenderer = require('electron').ipcRenderer
 // start the elm app in a container div
 let container = document.getElementById('container')
 let hotrod = Elm.embed(Elm.Main, container, {
-  file: { name: '', fileName: '', contents: '' }
+  file: { name: '', fileName: '', contents: '' },
+  fileError: null
 })
 
 hotrod.ports.fetchFile.subscribe((otherPath) => {
@@ -19,7 +20,7 @@ hotrod.ports.fetchFile.subscribe((otherPath) => {
   fs.readFile(filePath, 'utf8', (error, data) => {
     if (error) {
       console.log('error', error)
-      hotrod.ports.fileError.send(error)
+      hotrod.ports.fileError.send(`Error fetching: ${filePath}`)
     }
     let file = {
       name: fileName,

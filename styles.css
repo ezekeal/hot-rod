@@ -61,3 +61,21 @@ a:hover {
 .field .field-value {
   color: rgba(0, 0, 0, 0.8)
 }
+
+.error-message {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  color: red;
+  background-color: pink;
+  border-radius: 0.5rem;
+  border: 1px solid red;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.error-message:hover {
+  opacity: 0.8;
+}
