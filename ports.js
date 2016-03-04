@@ -13,21 +13,25 @@ let hotrod = Elm.embed(Elm.Main, container, {
 })
 
 hotrod.ports.fetchFile.subscribe((otherPath) => {
-  let filePath = ipcRenderer.sendSync('get-file')[0]
-  let extension = path.extname(filePath)
-  let fileName = path.basename(filePath)
+  ipcRenderer.send('get-file')
 
-  fs.readFile(filePath, 'utf8', (error, data) => {
-    if (error) {
-      console.log('error', error)
-      hotrod.ports.fileError.send(`Error fetching: ${filePath}`)
-    }
-    let file = {
-      name: fileName,
-      extension: extension,
-      contents: data
-    }
-    console.log('sending', file)
-    hotrod.ports.file.send(file)
+  ipcRenderer.on('get-file-reply', (event, result) => {
+    let filePath = result[0]
+    let extension = path.extname(filePath)
+    let fileName = path.basename(filePath)
+
+    fs.readFile(filePath, 'utf8', (error, data) => {
+      if (error) {
+        console.log('error', error)
+        hotrod.ports.fileError.send(`Error fetching: ${filePath}`)
+      }
+      let file = {
+        name: fileName,
+        extension: extension,
+        contents: data
+      }
+      console.log('sending', file)
+      hotrod.ports.file.send(file)
+    })
   })
 })

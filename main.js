@@ -40,12 +40,12 @@ function createWindow () {
   })
 }
 
-ipcMain.on('get-file', (event) => {
+ipcMain.on('get-file', (event, arg) => {
   let path = dialog.showOpenDialog({
     properties: [ 'openFile' ],
     filters: [{ name: 'JSON', extensions: ['json'] }]
   })
-  event.returnValue = path
+  event.sender.send('get-file-reply', path)
 })
 
 // Quit when all windows are closed.
