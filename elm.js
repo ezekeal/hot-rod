@@ -10932,6 +10932,7 @@ Elm.PackageJson.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Decode$Extra = Elm.Json.Decode.Extra.make(_elm),
    $List = Elm.List.make(_elm),
@@ -10940,6 +10941,17 @@ Elm.PackageJson.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
    var _op = {};
+   var semverSymbols = _U.list([{ctor: "_Tuple2",_0: "",_1: "exactly"}
+                               ,{ctor: "_Tuple2",_0: ">",_1: "above"}
+                               ,{ctor: "_Tuple2",_0: "<",_1: "below"}
+                               ,{ctor: "_Tuple2",_0: ">=",_1: "at least"}
+                               ,{ctor: "_Tuple2",_0: "<=",_1: "at most"}
+                               ,{ctor: "_Tuple2",_0: "~",_1: "approximately"}
+                               ,{ctor: "_Tuple2",_0: "^",_1: "compatible with"}
+                               ,{ctor: "_Tuple2",_0: "*",_1: "any version"}
+                               ,{ctor: "_Tuple2",_0: "-",_1: "to"}
+                               ,{ctor: "_Tuple2",_0: "||",_1: "or"}]);
+   var parseSemVer = function (semver) {    return A2($Html.span,_U.list([]),_U.list([]));};
    var baseName = function (str) {    return A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"/",str))));};
    var stringOrListString = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,function (n) {    return A2($List._op["::"],n,_U.list([]));},$Json$Decode.string)
                                                        ,$Json$Decode.list($Json$Decode.string)]));
@@ -10979,8 +10991,8 @@ Elm.PackageJson.make = function (_elm) {
                   ,dependencies: $Maybe.Nothing
                   ,devDependencies: $Maybe.Nothing
                   ,peerDependencies: $Maybe.Nothing
-                  ,bundeledDependencies: $Maybe.Nothing
-                  ,bundeleDependencies: $Maybe.Nothing
+                  ,bundledDependencies: $Maybe.Nothing
+                  ,bundleDependencies: $Maybe.Nothing
                   ,optionalDependencies: $Maybe.Nothing
                   ,engines: $Maybe.Nothing
                   ,os: $Maybe.Nothing
@@ -11059,8 +11071,8 @@ Elm.PackageJson.make = function (_elm) {
                                                                                                  ,dependencies: r
                                                                                                  ,devDependencies: s
                                                                                                  ,peerDependencies: t
-                                                                                                 ,bundeledDependencies: u
-                                                                                                 ,bundeleDependencies: v
+                                                                                                 ,bundledDependencies: u
+                                                                                                 ,bundleDependencies: v
                                                                                                  ,optionalDependencies: w
                                                                                                  ,engines: x
                                                                                                  ,os: y
@@ -11145,8 +11157,8 @@ Elm.PackageJson.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"dependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"devDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"peerDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundeledDependencies",$Json$Decode.list($Json$Decode.string)))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundeleDependencies",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundledDependencies",$Json$Decode.list($Json$Decode.string)))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"bundleDependencies",$Json$Decode.list($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"optionalDependencies",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"engines",$Json$Decode.keyValuePairs($Json$Decode.string)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"os",$Json$Decode.list($Json$Decode.string)))),
@@ -11168,7 +11180,9 @@ Elm.PackageJson.make = function (_elm) {
                                     ,stringOrKeyValue: stringOrKeyValue
                                     ,stringOrListString: stringOrListString
                                     ,decode: decode
-                                    ,baseName: baseName};
+                                    ,baseName: baseName
+                                    ,parseSemVer: parseSemVer
+                                    ,semverSymbols: semverSymbols};
 };
 Elm.HotRod = Elm.HotRod || {};
 Elm.HotRod.make = function (_elm) {
@@ -11210,50 +11224,68 @@ Elm.HotRod.make = function (_elm) {
       _U.list([$Html$Attributes.$class("field-value")]),
       _U.list([A2($Html.a,_U.list([$Html$Attributes.href(url)]),_U.list([$Html.text(url)]))]));
    };
-   var listValue = F2(function (view,values) {    return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,view,values));});
+   var listValue = F2(function (view,values) {
+      var listItem = function (value) {    return A2($Html.li,_U.list([]),_U.list([view(value)]));};
+      return A2($Html.ul,_U.list([$Html$Attributes.$class("sub-field")]),A2($List.map,listItem,values));
+   });
+   var depView = function (_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1._0;
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("dep-view")]),
+      _U.list([A2($Html.a,
+              _U.list([$Html$Attributes.$class("dep-name"),$Html$Attributes.href(A2($Basics._op["++"],"https://www.npmjs.com/package/",_p2))]),
+              _U.list([$Html.text(_p2)]))
+              ,A2($Html.span,_U.list([$Html$Attributes.$class("dep-version")]),_U.list([$Html.text(_p1._1)]))]));
+   };
    var stringValue = function (value) {    return A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]));};
-   var boolValue = function (bl) {    var _p0 = bl;if (_p0 === true) {    return stringValue("True");} else {    return stringValue("False");}};
+   var boolValue = function (bl) {    var _p3 = bl;if (_p3 === true) {    return stringValue("True");} else {    return stringValue("False");}};
    var listItemValue = F2(function (key,value) {    return A2($Html.li,_U.list([]),_U.list([A2(fieldView,key,stringValue(value))]));});
-   var personValue = function (_p1) {
-      var _p2 = _p1;
+   var personValue = function (_p4) {
+      var _p5 = _p4;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
       A2($List.filterMap,
-      function (_p3) {
-         var _p4 = _p3;
-         return A2($Maybe.map,listItemValue(_p4._0),_p4._1);
+      function (_p6) {
+         var _p7 = _p6;
+         return A2($Maybe.map,listItemValue(_p7._0),_p7._1);
       },
-      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p2.name},{ctor: "_Tuple2",_0: "Email",_1: _p2.email},{ctor: "_Tuple2",_0: "Url",_1: _p2.url}])));
+      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p5.name},{ctor: "_Tuple2",_0: "Email",_1: _p5.email},{ctor: "_Tuple2",_0: "Url",_1: _p5.url}])));
    };
-   var directoriesValue = function (_p5) {
-      var _p6 = _p5;
+   var directoriesValue = function (_p8) {
+      var _p9 = _p8;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
       A2($List.filterMap,
-      function (_p7) {
-         var _p8 = _p7;
-         return A2($Maybe.map,listItemValue(_p8._0),_p8._1);
+      function (_p10) {
+         var _p11 = _p10;
+         return A2($Maybe.map,listItemValue(_p11._0),_p11._1);
       },
-      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p6.bin}
-              ,{ctor: "_Tuple2",_0: "Doc",_1: _p6.doc}
-              ,{ctor: "_Tuple2",_0: "Lib",_1: _p6.lib}
-              ,{ctor: "_Tuple2",_0: "Man",_1: _p6.man}
-              ,{ctor: "_Tuple2",_0: "Example",_1: _p6.example}
-              ,{ctor: "_Tuple2",_0: "Tests",_1: _p6.tests}])));
+      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p9.bin}
+              ,{ctor: "_Tuple2",_0: "Doc",_1: _p9.doc}
+              ,{ctor: "_Tuple2",_0: "Lib",_1: _p9.lib}
+              ,{ctor: "_Tuple2",_0: "Man",_1: _p9.man}
+              ,{ctor: "_Tuple2",_0: "Example",_1: _p9.example}
+              ,{ctor: "_Tuple2",_0: "Tests",_1: _p9.tests}])));
    };
-   var pairValue = function (_p9) {    var _p10 = _p9;return A2(fieldView,_p10._0,stringValue(_p10._1));};
-   var repoView = function (_p11) {
-      var _p12 = _p11;
+   var pairValue = function (_p12) {    var _p13 = _p12;return A2(fieldView,_p13._0,stringValue(_p13._1));};
+   var repoView = function (_p14) {
+      var _p15 = _p14;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
-      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p12._0))]))
-              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p12._1))]))]));
+      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p15._0))]))
+              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p15._1))]))]));
    };
+   var divString = F2(function (className,name) {    return A2($Html.div,_U.list([$Html$Attributes.$class(className)]),_U.list([$Html.text(name)]));});
+   var spanString = F2(function (className,name) {    return A2($Html.span,_U.list([$Html$Attributes.$class(className)]),_U.list([$Html.text(name)]));});
    var packageJsonView = function (pj) {
-      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p13) {    return A2(fieldView,key,valueView(_p13));},value);});
-      var fields = _U.list([A3(kvDiv,"Name",stringValue,pj.name)
-                           ,A3(kvDiv,"Version",stringValue,pj.version)
-                           ,A3(kvDiv,"Description",stringValue,pj.description)
+      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p16) {    return A2(fieldView,key,valueView(_p16));},value);});
+      var fields = _U.list([$Maybe.Just(A2($Html.h1,
+                           _U.list([$Html$Attributes.$class("package-title")]),
+                           A2($List.filterMap,
+                           $Basics.identity,
+                           _U.list([A2($Maybe.map,spanString("package-name"),pj.name),A2($Maybe.map,spanString("package-version"),pj.version)]))))
+                           ,A2($Maybe.map,divString("package-description"),pj.description)
                            ,A3(kvDiv,"Main",stringValue,pj.main)
                            ,A3(kvDiv,"Keywords",listValue(stringValue),pj.keywords)
                            ,A3(kvDiv,"Repository",repoView,pj.repository)
@@ -11267,12 +11299,12 @@ Elm.HotRod.make = function (_elm) {
                            ,A3(kvDiv,"Bin",pairValue,pj.bin)
                            ,A3(kvDiv,"scripts",listValue(pairValue),pj.scripts)
                            ,A3(kvDiv,"config",listValue(pairValue),pj.config)
-                           ,A3(kvDiv,"Dependencies",listValue(pairValue),pj.dependencies)
-                           ,A3(kvDiv,"Dev Dependencies",listValue(pairValue),pj.devDependencies)
-                           ,A3(kvDiv,"Peer Dependencies",listValue(pairValue),pj.peerDependencies)
-                           ,A3(kvDiv,"Bundeled Dependencies",listValue(stringValue),pj.bundeledDependencies)
-                           ,A3(kvDiv,"Bundele Dependencies",listValue(stringValue),pj.bundeleDependencies)
-                           ,A3(kvDiv,"Optional Dependencies",listValue(pairValue),pj.optionalDependencies)
+                           ,A3(kvDiv,"Dependencies",listValue(depView),pj.dependencies)
+                           ,A3(kvDiv,"Dev Dependencies",listValue(depView),pj.devDependencies)
+                           ,A3(kvDiv,"Peer Dependencies",listValue(depView),pj.peerDependencies)
+                           ,A3(kvDiv,"Bundled Dependencies",listValue(stringValue),pj.bundledDependencies)
+                           ,A3(kvDiv,"Bundle Dependencies",listValue(stringValue),pj.bundleDependencies)
+                           ,A3(kvDiv,"Optional Dependencies",listValue(depView),pj.optionalDependencies)
                            ,A3(kvDiv,"Engines",listValue(pairValue),pj.engines)
                            ,A3(kvDiv,"OS",listValue(stringValue),pj.os)
                            ,A3(kvDiv,"CPU",listValue(stringValue),pj.cpu)
@@ -11283,9 +11315,9 @@ Elm.HotRod.make = function (_elm) {
    };
    var CloseError = {ctor: "CloseError"};
    var errorView = F2(function (address,error) {
-      var _p14 = error;
-      if (_p14.ctor === "Just") {
-            return A2($Html.div,_U.list([$Html$Attributes.$class("error-message"),A2($Html$Events.onClick,address,CloseError)]),_U.list([$Html.text(_p14._0)]));
+      var _p17 = error;
+      if (_p17.ctor === "Just") {
+            return A2($Html.div,_U.list([$Html$Attributes.$class("error-message"),A2($Html$Events.onClick,address,CloseError)]),_U.list([$Html.text(_p17._0)]));
          } else {
             return A2($Html.span,_U.list([]),_U.list([]));
          }
@@ -11293,8 +11325,8 @@ Elm.HotRod.make = function (_elm) {
    var FileError = function (a) {    return {ctor: "FileError",_0: a};};
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
    var decodeContents = function (file) {
-      var _p15 = $String.toLower(function (_) {    return _.name;}(file));
-      if (_p15 === "package.json") {
+      var _p18 = $String.toLower(function (_) {    return _.name;}(file));
+      if (_p18 === "package.json") {
             return ReceivePackageJson(function (_) {    return _.contents;}(file));
          } else {
             return FileError($Maybe.Just("File not recognized"));
@@ -11314,12 +11346,12 @@ Elm.HotRod.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p16 = action;
-      switch (_p16.ctor)
+      var _p19 = action;
+      switch (_p19.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p16._0)};
-         case "ReceivePackageJson": return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p16._0)}),_1: $Effects.none};
-         case "FileError": return {ctor: "_Tuple2",_0: _U.update(model,{error: _p16._0}),_1: $Effects.none};
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p19._0)};
+         case "ReceivePackageJson": return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p19._0)}),_1: $Effects.none};
+         case "FileError": return {ctor: "_Tuple2",_0: _U.update(model,{error: _p19._0}),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: _U.update(model,{error: $Maybe.Nothing}),_1: $Effects.none};}
    });
    var initialModel = {packageJson: $PackageJson.$default,error: $Maybe.Nothing};
@@ -11338,7 +11370,10 @@ Elm.HotRod.make = function (_elm) {
                                ,view: view
                                ,errorView: errorView
                                ,packageJsonView: packageJsonView
+                               ,spanString: spanString
+                               ,divString: divString
                                ,stringValue: stringValue
+                               ,depView: depView
                                ,listValue: listValue
                                ,boolValue: boolValue
                                ,listItemValue: listItemValue

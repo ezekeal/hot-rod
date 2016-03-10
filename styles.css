@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300);
 
 /*
   red: #CB3837
@@ -6,7 +6,8 @@
 */
 
 body {
-  font-family: 'Source Sans Pro', 'Lucida Grande', sans-serif
+  font-family: 'Source Sans Pro', 'Lucida Grande', sans-serif;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 ul {
@@ -38,6 +39,31 @@ a:hover {
   text-decoration: underline;
 }
 
+.package-title {
+  margin: 0 0 0.2rem 0;
+}
+
+.package-name {
+  padding-right: 0.4rem;
+}
+
+.package-version {
+  color: rgba(0,0,0,0.6);
+  font-size: 1.2rem;
+}
+
+.package-description {
+  font-weight: 300;
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.dep-name {
+  margin-right: 0.7rem;
+}
+
+.dep-description {}
+
 .get-package-json {
   margin-bottom: 1rem;
 }
@@ -59,7 +85,7 @@ a:hover {
 }
 
 .field .field-value {
-  color: rgba(0, 0, 0, 0.8)
+
 }
 
 .error-message {
