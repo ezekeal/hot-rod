@@ -10931,8 +10931,8 @@ Elm.PackageJson.make = function (_elm) {
    if (_elm.PackageJson.values) return _elm.PackageJson.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Char = Elm.Char.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $Json$Decode$Extra = Elm.Json.Decode.Extra.make(_elm),
    $List = Elm.List.make(_elm),
@@ -10941,8 +10941,7 @@ Elm.PackageJson.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
    var _op = {};
-   var semverSymbols = _U.list([{ctor: "_Tuple2",_0: "",_1: "exactly"}
-                               ,{ctor: "_Tuple2",_0: ">",_1: "above"}
+   var semverSymbols = _U.list([{ctor: "_Tuple2",_0: ">",_1: "above"}
                                ,{ctor: "_Tuple2",_0: "<",_1: "below"}
                                ,{ctor: "_Tuple2",_0: ">=",_1: "at least"}
                                ,{ctor: "_Tuple2",_0: "<=",_1: "at most"}
@@ -10950,8 +10949,59 @@ Elm.PackageJson.make = function (_elm) {
                                ,{ctor: "_Tuple2",_0: "^",_1: "compatible with"}
                                ,{ctor: "_Tuple2",_0: "*",_1: "any version"}
                                ,{ctor: "_Tuple2",_0: "-",_1: "to"}
-                               ,{ctor: "_Tuple2",_0: "||",_1: "or"}]);
-   var parseSemVer = function (semver) {    return A2($Html.span,_U.list([]),_U.list([]));};
+                               ,{ctor: "_Tuple2",_0: "||",_1: "or"}
+                               ,{ctor: "_Tuple2",_0: "",_1: "exactly"}]);
+   var getSvType = function (str) {
+      var isTag = A2($String.all,function (c) {    return $Basics.not($Char.isDigit(c));},str);
+      var first = function (n) {    return A2($String.left,n,str);};
+      var isHttp = _U.eq(first(4),"http");
+      var isGit = _U.eq(first(3),"git");
+      var isPath = A2($List.any,
+      function (_p0) {
+         var _p1 = _p0;
+         return _U.eq(_p1._0,_p1._1);
+      },
+      _U.list([{ctor: "_Tuple2",_0: first(3),_1: "../"}
+              ,{ctor: "_Tuple2",_0: first(2),_1: "./"}
+              ,{ctor: "_Tuple2",_0: first(2),_1: "~/"}
+              ,{ctor: "_Tuple2",_0: first(1),_1: "/"}]));
+      var isOr = _U.eq(first(2),"||");
+      var isTo = _U.eq(first(1),"-");
+      var isFile = _U.eq(first(4),"file");
+      return isHttp ? "http" : isGit ? "git" : isPath ? "path" : isOr ? "or" : isTo ? "to" : isFile ? "file" : isTag ? "tag" : "version";
+   };
+   var parseVersions = function (_p2) {
+      var _p3 = _p2;
+      var _p8 = _p3._0;
+      var _p7 = _p3._1;
+      var verSign = function (str) {
+         return $Basics.snd(A2($Maybe.withDefault,
+         {ctor: "_Tuple2",_0: "?",_1: "?"},
+         $List.head(A2($List.filter,function (_p4) {    var _p5 = _p4;return _U.eq(str,_p5._0);},semverSymbols))));
+      };
+      var versionSign = function (s) {
+         return _U.list([{ctor: "_Tuple2",_0: verSign(s),_1: s}]);
+      }(A2($String.filter,function (c) {    return $Basics.not($Char.isDigit(c)) && (!_U.eq(c,_U.chr(".")) && !_U.eq(c,_U.chr("x")));},_p7));
+      var verlist = F2(function (i,ver) {
+         var _p6 = i;
+         switch (_p6)
+         {case 0: return {ctor: "_Tuple2",_0: "major",_1: ver};
+            case 1: return {ctor: "_Tuple2",_0: "minor",_1: ver};
+            case 2: return {ctor: "_Tuple2",_0: "patch",_1: ver};
+            default: return {ctor: "_Tuple2",_0: "?",_1: ver};}
+      });
+      var versionNumber = A2($List.indexedMap,
+      verlist,
+      A2($String.split,".",A2($String.filter,function (c) {    return $Char.isDigit(c) || (_U.eq(c,_U.chr(".")) || _U.eq(c,_U.chr("x")));},_p7)));
+      return _U.eq(_p8,"version") ? $List.concat(_U.list([versionSign,versionNumber])) : _U.list([{ctor: "_Tuple2",_0: _p8,_1: _p7}]);
+   };
+   var parseSemVer = function (semver) {
+      var assignType = function (str) {    return {ctor: "_Tuple2",_0: getSvType(str),_1: str};};
+      var svList = A2($String.split," ",semver);
+      return _U.eq($String.length(semver),0) ? _U.list([{ctor: "_Tuple2",_0: "any",_1: ""}]) : $List.concat(A2($List.map,
+      parseVersions,
+      A2($List.map,assignType,svList)));
+   };
    var baseName = function (str) {    return A2($Maybe.withDefault,"",$List.head($List.reverse(A2($String.split,"/",str))));};
    var stringOrListString = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,function (n) {    return A2($List._op["::"],n,_U.list([]));},$Json$Decode.string)
                                                        ,$Json$Decode.list($Json$Decode.string)]));
@@ -11182,6 +11232,8 @@ Elm.PackageJson.make = function (_elm) {
                                     ,decode: decode
                                     ,baseName: baseName
                                     ,parseSemVer: parseSemVer
+                                    ,parseVersions: parseVersions
+                                    ,getSvType: getSvType
                                     ,semverSymbols: semverSymbols};
 };
 Elm.HotRod = Elm.HotRod || {};
@@ -11230,29 +11282,39 @@ Elm.HotRod.make = function (_elm) {
    });
    var depView = function (_p0) {
       var _p1 = _p0;
-      var _p2 = _p1._0;
+      var _p6 = _p1._0;
+      var match = F2(function (typ,arr) {    return A2($List.any,F2(function (x,y) {    return _U.eq(x,y);})(typ),arr);});
+      var componentView = function (_p2) {
+         var _p3 = _p2;
+         var _p5 = _p3._0;
+         var _p4 = _p3._1;
+         return A2(match,_p5,_U.list(["git","http","file"])) ? A2($Html.a,_U.list([$Html$Attributes.href(_p4)]),_U.list([$Html.text(_p4)])) : _U.eq(_p5,
+         "major") ? A2($Html.span,_U.list([]),_U.list([$Html.text(_p4)])) : _U.eq(_p5,"tag") ? A2($Html.span,
+         _U.list([]),
+         _U.list([$Html.text(A2($Basics._op["++"],"\'",A2($Basics._op["++"],_p4,"\'")))])) : _U.eq(_p5,"minor") ? A2($Html.span,
+         _U.list([]),
+         _U.list([$Html.text(A2($Basics._op["++"],".",_p4))])) : _U.eq(_p5,"patch") ? A2($Html.span,
+         _U.list([]),
+         _U.list([$Html.text(A2($Basics._op["++"],".",A2($Basics._op["++"],_p4," ")))])) : A2(match,_p5,_U.list(["or","to"])) ? A2($Html.span,
+         _U.list([$Html$Attributes.$class("semver-symbol")]),
+         _U.list([$Html.text(A2($Basics._op["++"]," ",A2($Basics._op["++"],_p5,A2($Basics._op["++"]," (",A2($Basics._op["++"],_p4,") ")))))])) : _U.eq(_p5,
+         "exactly") ? A2($Html.span,_U.list([$Html$Attributes.$class("semver-symbol")]),_U.list([$Html.text(A2($Basics._op["++"],_p5," "))])) : A2($Html.span,
+         _U.list([$Html$Attributes.$class("semver-symbol")]),
+         _U.list([$Html.text(A2($Basics._op["++"],_p5,A2($Basics._op["++"]," (",A2($Basics._op["++"],_p4,")"))))]));
+      };
+      var parsed = A2($List.map,componentView,$PackageJson.parseSemVer(_p1._1));
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("dep-view")]),
       _U.list([A2($Html.a,
-              _U.list([$Html$Attributes.$class("dep-name"),$Html$Attributes.href(A2($Basics._op["++"],"https://www.npmjs.com/package/",_p2))]),
-              _U.list([$Html.text(_p2)]))
-              ,A2($Html.span,_U.list([$Html$Attributes.$class("dep-version")]),_U.list([$Html.text(_p1._1)]))]));
+              _U.list([$Html$Attributes.$class("dep-name"),$Html$Attributes.href(A2($Basics._op["++"],"https://www.npmjs.com/package/",_p6))]),
+              _U.list([$Html.text(_p6)]))
+              ,A2($Html.span,_U.list([]),_U.list([$Html.text(": ")]))
+              ,A2($Html.span,_U.list([$Html$Attributes.$class("dep-version")]),parsed)]));
    };
    var stringValue = function (value) {    return A2($Html.span,_U.list([$Html$Attributes.$class("field-value")]),_U.list([$Html.text(value)]));};
-   var boolValue = function (bl) {    var _p3 = bl;if (_p3 === true) {    return stringValue("True");} else {    return stringValue("False");}};
+   var boolValue = function (bl) {    var _p7 = bl;if (_p7 === true) {    return stringValue("True");} else {    return stringValue("False");}};
    var listItemValue = F2(function (key,value) {    return A2($Html.li,_U.list([]),_U.list([A2(fieldView,key,stringValue(value))]));});
-   var personValue = function (_p4) {
-      var _p5 = _p4;
-      return A2($Html.ul,
-      _U.list([$Html$Attributes.$class("sub-field")]),
-      A2($List.filterMap,
-      function (_p6) {
-         var _p7 = _p6;
-         return A2($Maybe.map,listItemValue(_p7._0),_p7._1);
-      },
-      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p5.name},{ctor: "_Tuple2",_0: "Email",_1: _p5.email},{ctor: "_Tuple2",_0: "Url",_1: _p5.url}])));
-   };
-   var directoriesValue = function (_p8) {
+   var personValue = function (_p8) {
       var _p9 = _p8;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
@@ -11261,25 +11323,36 @@ Elm.HotRod.make = function (_elm) {
          var _p11 = _p10;
          return A2($Maybe.map,listItemValue(_p11._0),_p11._1);
       },
-      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p9.bin}
-              ,{ctor: "_Tuple2",_0: "Doc",_1: _p9.doc}
-              ,{ctor: "_Tuple2",_0: "Lib",_1: _p9.lib}
-              ,{ctor: "_Tuple2",_0: "Man",_1: _p9.man}
-              ,{ctor: "_Tuple2",_0: "Example",_1: _p9.example}
-              ,{ctor: "_Tuple2",_0: "Tests",_1: _p9.tests}])));
+      _U.list([{ctor: "_Tuple2",_0: "Name",_1: _p9.name},{ctor: "_Tuple2",_0: "Email",_1: _p9.email},{ctor: "_Tuple2",_0: "Url",_1: _p9.url}])));
    };
-   var pairValue = function (_p12) {    var _p13 = _p12;return A2(fieldView,_p13._0,stringValue(_p13._1));};
-   var repoView = function (_p14) {
-      var _p15 = _p14;
+   var directoriesValue = function (_p12) {
+      var _p13 = _p12;
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("sub-field")]),
-      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p15._0))]))
-              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p15._1))]))]));
+      A2($List.filterMap,
+      function (_p14) {
+         var _p15 = _p14;
+         return A2($Maybe.map,listItemValue(_p15._0),_p15._1);
+      },
+      _U.list([{ctor: "_Tuple2",_0: "Bin",_1: _p13.bin}
+              ,{ctor: "_Tuple2",_0: "Doc",_1: _p13.doc}
+              ,{ctor: "_Tuple2",_0: "Lib",_1: _p13.lib}
+              ,{ctor: "_Tuple2",_0: "Man",_1: _p13.man}
+              ,{ctor: "_Tuple2",_0: "Example",_1: _p13.example}
+              ,{ctor: "_Tuple2",_0: "Tests",_1: _p13.tests}])));
+   };
+   var pairValue = function (_p16) {    var _p17 = _p16;return A2(fieldView,_p17._0,stringValue(_p17._1));};
+   var repoView = function (_p18) {
+      var _p19 = _p18;
+      return A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sub-field")]),
+      _U.list([A2($Html.li,_U.list([]),_U.list([A2(fieldView,"type",stringValue(_p19._0))]))
+              ,A2($Html.li,_U.list([]),_U.list([A2(fieldView,"url",linkValue(_p19._1))]))]));
    };
    var divString = F2(function (className,name) {    return A2($Html.div,_U.list([$Html$Attributes.$class(className)]),_U.list([$Html.text(name)]));});
    var spanString = F2(function (className,name) {    return A2($Html.span,_U.list([$Html$Attributes.$class(className)]),_U.list([$Html.text(name)]));});
    var packageJsonView = function (pj) {
-      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p16) {    return A2(fieldView,key,valueView(_p16));},value);});
+      var kvDiv = F3(function (key,valueView,value) {    return A2($Maybe.map,function (_p20) {    return A2(fieldView,key,valueView(_p20));},value);});
       var fields = _U.list([$Maybe.Just(A2($Html.h1,
                            _U.list([$Html$Attributes.$class("package-title")]),
                            A2($List.filterMap,
@@ -11315,9 +11388,9 @@ Elm.HotRod.make = function (_elm) {
    };
    var CloseError = {ctor: "CloseError"};
    var errorView = F2(function (address,error) {
-      var _p17 = error;
-      if (_p17.ctor === "Just") {
-            return A2($Html.div,_U.list([$Html$Attributes.$class("error-message"),A2($Html$Events.onClick,address,CloseError)]),_U.list([$Html.text(_p17._0)]));
+      var _p21 = error;
+      if (_p21.ctor === "Just") {
+            return A2($Html.div,_U.list([$Html$Attributes.$class("error-message"),A2($Html$Events.onClick,address,CloseError)]),_U.list([$Html.text(_p21._0)]));
          } else {
             return A2($Html.span,_U.list([]),_U.list([]));
          }
@@ -11325,8 +11398,8 @@ Elm.HotRod.make = function (_elm) {
    var FileError = function (a) {    return {ctor: "FileError",_0: a};};
    var ReceivePackageJson = function (a) {    return {ctor: "ReceivePackageJson",_0: a};};
    var decodeContents = function (file) {
-      var _p18 = $String.toLower(function (_) {    return _.name;}(file));
-      if (_p18 === "package.json") {
+      var _p22 = $String.toLower(function (_) {    return _.name;}(file));
+      if (_p22 === "package.json") {
             return ReceivePackageJson(function (_) {    return _.contents;}(file));
          } else {
             return FileError($Maybe.Just("File not recognized"));
@@ -11346,12 +11419,12 @@ Elm.HotRod.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var fetchFile = function (filePath) {    return A2($Effects.map,$Basics.always(NoOp),$Effects.task(A2($Signal.send,fetchFileBox.address,filePath)));};
    var update = F2(function (action,model) {
-      var _p19 = action;
-      switch (_p19.ctor)
+      var _p23 = action;
+      switch (_p23.ctor)
       {case "NoOp": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p19._0)};
-         case "ReceivePackageJson": return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p19._0)}),_1: $Effects.none};
-         case "FileError": return {ctor: "_Tuple2",_0: _U.update(model,{error: _p19._0}),_1: $Effects.none};
+         case "RequestFile": return {ctor: "_Tuple2",_0: model,_1: fetchFile(_p23._0)};
+         case "ReceivePackageJson": return {ctor: "_Tuple2",_0: _U.update(model,{packageJson: $PackageJson.decode(_p23._0)}),_1: $Effects.none};
+         case "FileError": return {ctor: "_Tuple2",_0: _U.update(model,{error: _p23._0}),_1: $Effects.none};
          default: return {ctor: "_Tuple2",_0: _U.update(model,{error: $Maybe.Nothing}),_1: $Effects.none};}
    });
    var initialModel = {packageJson: $PackageJson.$default,error: $Maybe.Nothing};

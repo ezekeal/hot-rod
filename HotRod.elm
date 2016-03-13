@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Encode
 import String exposing (toLower)
-import PackageJson exposing (PackageJson)
+import PackageJson exposing (PackageJson, parseSemVer)
 import Fs exposing (File)
 
 
@@ -162,10 +162,35 @@ stringValue value =
 
 depView : (String, String) -> Html
 depView (name, version) =
-    div [ class "dep-view" ]
-        [ a [ class "dep-name", href ("https://www.npmjs.com/package/" ++ name) ] [ text name ]
-        , span [ class "dep-version" ] [ text version ]
-        ]
+    let
+        match typ arr =
+            List.any ((==) typ) arr
+        componentView (verType, val) =
+            if match verType ["git", "http", "file"] then
+                a [ href val ] [ text val ]
+            else if verType == "major" then
+                span [ ] [ text val ]
+            else if verType == "tag" then
+                span [ ] [ text ("'" ++ val ++ "'") ]
+            else if verType == "minor" then
+                span [ ] [ text ("." ++ val) ]
+            else if verType == "patch" then
+                span [ ] [ text ("." ++ val ++ " ") ]
+            else if match verType ["or", "to"] then
+                span [ class "semver-symbol" ] [ text (" " ++ verType ++ " (" ++ val ++ ") ") ]
+            else if verType == "exactly" then
+                span [ class "semver-symbol" ] [ text (verType ++ " ") ]
+            else
+                span [ class "semver-symbol" ] [ text (verType ++ " (" ++ val ++ ")") ]
+        parsed =
+            parseSemVer version
+            |> List.map componentView
+    in
+        div [ class "dep-view" ]
+            [ a [ class "dep-name", href ("https://www.npmjs.com/package/" ++ name) ] [ text name ]
+            , span [ ] [ text ": " ]
+            , span [ class "dep-version" ] parsed
+            ]
 
 
 listValue : (a -> Html) -> List a -> Html

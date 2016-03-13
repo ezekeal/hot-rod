@@ -3,7 +3,7 @@ module PackageJson (..) where
 import Json.Decode exposing (..)
 import Json.Decode.Extra exposing ((|:), lazy)
 import String
-import Html exposing (..)
+import Char
 
 
 -- Types
@@ -216,17 +216,102 @@ baseName str =
     |> List.head
     |> Maybe.withDefault ""
 
-parseSemVer : String -> Html
+parseSemVer : String -> List (String, String)
 parseSemVer semver =
-    span [ ] [ ]
--- TODO convert semver
+    let
+        svList =
+            String.split " " semver
+        assignType str =
+            (getSvType str, str)
+    in
+        if String.length semver == 0 then
+            [("any", "")]
+        else
+            List.map assignType svList
+            |> List.map parseVersions
+            |> List.concat
+
+parseVersions : (String, String) -> List (String, String)
+parseVersions (vType, v) =
+    let
+        verlist i ver =
+            case i of
+                0 ->
+                    ("major", ver)
+                1 ->
+                    ("minor", ver)
+                2 ->
+                    ("patch", ver)
+                _->
+                    ("?",ver)
+
+        verSign str =
+            List.filter (\(sym, txt) -> str == sym) semverSymbols
+            |> List.head
+            |> Maybe.withDefault ("?","?")
+            |> snd
+
+        versionSign =
+            String.filter (\c -> not (Char.isDigit c) && c /= '.' && c/= 'x') v
+            |> (\s -> [(verSign s, s)])
+
+        versionNumber =
+            String.filter (\c -> Char.isDigit c || c == '.' || c == 'x') v
+            |> String.split "."
+            |> List.indexedMap verlist
+    in
+        if vType == "version" then
+            List.concat [versionSign, versionNumber]
+        else
+            [(vType, v)]
+
+getSvType : String -> String
+getSvType str =
+    let
+        first n =
+            String.left n str
+        isHttp =
+            first 4 == "http"
+        isGit =
+            first 3 == "git"
+        isPath =
+            [ (first 3, "../")
+            , (first 2, "./")
+            , (first 2, "~/")
+            , (first 1, "/")
+            ]
+            |> List.any (\(a,b) -> a == b)
+        isOr =
+            first 2 == "||"
+        isTo =
+            first 1 == "-"
+        isFile =
+            first 4 == "file"
+        isTag =
+            String.all (\c -> not (Char.isDigit c)) str
+    in
+        if isHttp then
+            "http"
+        else if isGit then
+            "git"
+        else if isPath then
+            "path"
+        else if isOr then
+            "or"
+        else if isTo then
+            "to"
+        else if isFile then
+            "file"
+        else if isTag then
+            "tag"
+        else
+            "version"
 
 -- Reference
 
 semverSymbols : List (String, String)
 semverSymbols =
-    [ ("", "exactly")
-    , (">", "above")
+    [ (">", "above")
     , ("<", "below")
     , (">=", "at least")
     , ("<=", "at most")
@@ -235,4 +320,5 @@ semverSymbols =
     , ("*", "any version")
     , ("-", "to")
     , ("||", "or")
+    , ("", "exactly")
     ]
