@@ -1,5 +1,7 @@
 #Hot Rod - A node gui
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ezekeal/hot-rod.svg)](https://greenkeeper.io/)
+
 This is an attempt to build a desktop gui for node projects.
 
 ![screenshot](/screenshot.png)
